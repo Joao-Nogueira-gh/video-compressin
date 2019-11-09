@@ -1,7 +1,17 @@
+import math
+
+from truncated_binary_encoding import truncated_binary_encoding
+
+#todo: how to calculate optimal M?
+#cant revert truncated binary encoding...
+
 class Golomb:
     def __init__(self, factor):
         self.factor=factor
         self.sequenceFlag=False
+        self.standardM=False
+        if math.log(factor,2).is_integer():
+            self.standardM=True
 
     def encode(self,string):
         print('encoding',string)
@@ -44,6 +54,19 @@ class Golomb:
         return s
     
     def convertToBinary(self,number):
-        conv="{0:b}".format(number) #alternative para retirar 0b
-        print(conv,type(conv))
-        return conv
+        if self.standardM:
+            conv="{0:b}".format(number) #alternative para retirar 0b
+            print(conv,type(conv))
+            return conv
+        else:
+            x=truncated_binary_encoding(number,self.factor)
+            # b=math.log(self.factor,2)
+            # b=math.ceil(b)
+            # if number<b:
+            #     #less bits
+            #     pass
+            # else:
+            #     #more bits
+            #     pass
+            print("truncated",x,type(x))
+            return x

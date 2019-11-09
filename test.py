@@ -1,7 +1,7 @@
 from Golomb import *
 
 def main():
-    g=Golomb(8)
+    g=Golomb(5)
     a=g.encode(15)
     g.decode(a)
     b=g.encode(20)
