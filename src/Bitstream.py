@@ -1,5 +1,3 @@
-from testing import BitReader, BitWriter
-
 ## BitStream class
 # Supported methods:
 #   Writing one bit
@@ -7,41 +5,60 @@ from testing import BitReader, BitWriter
 #   Writing n bits
 #   Reading n bits
 
-
 class BitStream:
-    def __init__(self, infile, outfile):
-        self.reader = BitReader(infile)
-        self.writer = BitWriter(outfile)
+    def __init__(self, fin, fout):
+        self.write_accumulator = 0
+        self.write_bcount = 0
+        self.out = fout
+ 
+        self.input = fin
+        self.read_accumulator = 0
+        self.read_bcount = 0
+        self.read = 0
 
+    def __enter__(self):
+        return self
+ 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.flush()
+ 
+    def __del__(self):
+        try:
+            self.flush()
+        except ValueError:   # I/O operation on closed file.
+            pass
+ 
+    def _writebit(self, bit):
+        if self.write_bcount == 8:
+            self.flush()
+        if bit > 0:
+            self.write_accumulator |= 1 << 7-self.write_bcount
+        self.write_bcount += 1
+ 
+    def writebits(self, bits, n):
+        while n > 0:
+            self._writebit(bits & 1 << n-1)
+            n -= 1
 
-    def write_bit(self, bit):
-        self.writer._writebit(bit)
+    def _readbit(self):
+        if not self.read_bcount:
+            a = self.input.read(1)
+            if a:
+                self.read_accumulator = ord(a)
+            self.read_bcount = 8
+            self.read = len(a)
+        rv = (self.read_accumulator & (1 << self.read_bcount-1)) >> self.read_bcount-1
+        self.read_bcount -= 1
+        return rv
+ 
+    def readbits(self, n):
+        v = 0
+        while n > 0:
+            v = (v << 1) | self._readbit()
+            n -= 1
+        return v
 
-
-    def read_bit(self):
-        bit = self.reader._readbit()
-        return bit
-         
-
-    def write_bits(self, bits, count):
-        self.writer.writebits(bits, count)
-
-
-    def read_bits(self, count):
-        bits = self.reader.readbits(count)
-        return bits
-
-
-if __name__ == '__main__':
-    bts = BitStream(open("bitio_test.dat", 'rb'), open("output_bits.dat", 'wb'))
-    chars = '01000000'
-    for c in chars:
-        bts.write_bits(ord(c), 1)
-
-    chars = []
-    while True:
-        x = bts.read_bits(7)
-        if not bts.reader.read:  # End-of-file?
-            break
-        chars.append(chr(x))
-    print(''.join(chars))
+    def flush(self):
+        self.out.write(bytearray([self.write_accumulator]))
+        self.write_accumulator = 0
+        self.write_bcount = 0
