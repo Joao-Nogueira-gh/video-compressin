@@ -4,6 +4,7 @@
 #   Reading one bit
 #   Writing n bits
 #   Reading n bits
+## It is assumed that a user can never pass the same file as input and output
 
 class BitStream:
     def __init__(self, fin, fout):
@@ -62,3 +63,16 @@ class BitStream:
         self.out.write(bytearray([self.write_accumulator]))
         self.write_accumulator = 0
         self.write_bcount = 0
+
+    def set_infile(self, fin):
+        self.input.close()
+        self.input = fin
+        self.read_accumulator = 0
+        self.read_bcount = 0
+        self.read = 0
+
+    def set_outfile(self, fout):
+        self.out.close()
+        self.write_accumulator = 0
+        self.write_bcount = 0
+        self.out = fout
