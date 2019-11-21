@@ -31,14 +31,14 @@ class Golomb:
     # Quotient converted to Unary code
     # Remainder converted to Binary code 
     def encode(self,number):
-        print('encoding',number)
+        #print('encoding',number)
         number=int(number) #in case it's not a number it also works with strings
         (q,r)=divmod(number,self.factor)
-        print(q,r)
+        #print(q,r)
         un=self.convertToUnary(q)
         bn=self.convertToBinary(r)
         code=un+bn
-        print('encoded to',code, type(code))
+        #print('encoded to',code, type(code))
         return code
 
     ## Decoding function
@@ -62,9 +62,9 @@ class Golomb:
             else:
                 q+=1
         r=int(r,2)
-        print(q,r)
+        #print(q,r)
         number=self.factor*q+r
-        print('decoded->',number, type(number))
+        #print('decoded->',number, type(number))
         return number
 
     ## Convertion to Unary Code
@@ -77,7 +77,7 @@ class Golomb:
         for i in range(0,number):
             sequence+='1'
         sequence+='0'
-        print(sequence)
+        #print(sequence)
         return sequence
     ## Convertion to Binary Code
     # \param[in] number The number to be encoded to Binary
@@ -87,7 +87,7 @@ class Golomb:
     def convertToBinary(self,number):
         if self.standardM:
             sequence="{0:b}".format(number) #alternative para retirar 0b
-            print(sequence)
+            #print(sequence)
             return sequence
         else:
             sequence=truncated_binary_encoding(number,self.factor)
@@ -99,5 +99,5 @@ class Golomb:
             # else:
             #     #more bits
             #     pass
-            print("truncated",sequence)
+            #print("truncated",sequence)
             return sequence
