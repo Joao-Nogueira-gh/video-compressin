@@ -1,27 +1,36 @@
 from Bitstream import BitStream
 
 if __name__ == '__main__':
-    bts = BitStream("input_bits.dat", "WRITE")
-    chars = '01000000'
+
+
+    bts = BitStream("output_bits.dat", "WRITE")
+    
+    # Writing a few random bits to a file
+    chars = '01010101'
     for c in chars:
         bts.writebits(ord(c), 1)
 
-    bts.write_n_bits(128, 8)
+    # Writing 255 using 9 bits (first will be left as 0)
+    bts.write_n_bits(255, 9)
     
+    # Closing file - mandatory if we wish to perform different operations
     bts.close()
 
-    bts = BitStream("input_bits.dat", "READ")
 
+    # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+
+    bts = BitStream("output_bits.dat", "READ")
+
+    # Reading 8 chars, that should result in the same random bits as before
     chars = []
     for i in range(0, 8):
         chars.append(str(bts._readbit()))
 
     print(''.join(chars))
 
+    # Reading the value stored in the NEXT 9 bits (should be the 255 we wrote)
+    print(bts.read_n_bits(9))
 
-    # bts.write_n_bits(value, n_bits) -> write value using n_bits
-    # bts.read_n_bits(n_bits) -> read value corresponding to n_bits
-
-    print(bts._readbit(),bts._readbit(),bts._readbit(),bts._readbit()
-    ,bts._readbit(),bts._readbit(),bts._readbit(),bts._readbit())
-
+    # Closing file - not mandatory, but good practice
+    bts.close()
