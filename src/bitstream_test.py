@@ -3,7 +3,7 @@ from Bitstream import BitStream
 if __name__ == '__main__':
 
 
-    bts = BitStream("output_bits.dat", "WRITE")
+    bts = BitStream("../res/output_bits.dat", "WRITE")
     
     # Writing a few random bits to a file
     chars = '01010101'
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 
-    bts = BitStream("output_bits.dat", "READ")
+    bts = BitStream("../res/output_bits.dat", "READ")
 
     # Reading 8 chars, that should result in the same random bits as before
     chars = []
