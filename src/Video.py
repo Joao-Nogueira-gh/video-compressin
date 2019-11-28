@@ -61,6 +61,10 @@ class Video:
                 u=np.frombuffer(frameU, dtype=np.uint8)
                 v=np.frombuffer(frameV, dtype=np.uint8)
 
+                y=y.reshape(self.shape)
+                u=u.reshape(self.shape)
+                v=v.reshape(self.shape)
+
                 self.frameY+=[y]
                 self.frameU+=[u]
                 self.frameV+=[v]
@@ -111,3 +115,17 @@ class Video:
         self.yLength=int(self.frameLength*(2/3))
         self.uLength=self.vLength=int(self.frameLength*(1/6))
         self.shape = (int(self.height), self.width)
+
+    def print(self):
+        c=1
+        for x in self.frameY:
+            print(x, len(x), c,'y' ,end='\n\n')
+            c+=1
+        c=1
+        for x in self.frameU:
+            print(x, len(x),c, 'u', end='\n\n')
+            c+=1
+        c=1
+        for x in self.frameV:
+            print(x, len(x),c, 'v', end='\n\n')
+            c+=1
