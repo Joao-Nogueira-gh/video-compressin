@@ -2,5 +2,8 @@ from Video import Video
 
 
 if __name__ == "__main__":
-    vp = Video('../res/ducks_take_off_444_720p50.y4m')
+    v1="../res/ducks_take_off_444_720p50.y4m"
+    v2="../res/ducks_take_off_422_720p50.y4m"
+    v3="../res/ducks_take_off_420_720p50.y4m"
+    vp = Video(v1)
     vp.play_video()
