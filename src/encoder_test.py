@@ -14,6 +14,11 @@ if __name__ == "__main__":
     v3="../res/ducks_take_off_420_720p50.y4m"
     v=Video(v1)
     v.read_video()
-    v.print()
+    p=v.getYUVPixel(0,0,0)
+    #v.print()
+    v.iterate()
+
+    v.printrgb()
+    v.bruh()
 
 
