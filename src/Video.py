@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from PIL import Image
 
 class Video:
 
@@ -16,7 +17,8 @@ class Video:
         self.frameY=[]
         self.frameV=[]
         self.frameU=[]
-
+        #
+        self.frameRGB=[]
     def play_video(self):
         cap = cv2.VideoCapture(self.vid)
 
@@ -39,7 +41,7 @@ class Video:
 
             # Processing header
             if c==1:
-                print(line)
+                #print(line)
                 line=line.decode(self.encoding)
                 fields=line.split(" ")
 
@@ -75,7 +77,7 @@ class Video:
 
             c+=1
 
-        print('500 = 50fps * 10 SeemsGood')
+        #print('500 = 50fps * 10 SeemsGood')
         f.close()
 
 
@@ -123,15 +125,18 @@ class Video:
     def print(self):
         c=1
         for x in self.frameY:
-            print(x, len(x), c,'y' ,end='\n\n')
+            print(x, len(x[0]),len(x), c,'y' ,end='\n\n')
+            if c==1: break
             c+=1
         c=1
         for x in self.frameU:
-            print(x, len(x),c, 'u', end='\n\n')
+            print(x, len(x[0]),len(x),c, 'u', end='\n\n')
+            if c==1: break
             c+=1
         c=1
         for x in self.frameV:
-            print(x, len(x),c, 'v', end='\n\n')
+            print(x, len(x[0]),len(x),c, 'v', end='\n\n')
+            if c==1: break
             c+=1
 
     def resize(self):
@@ -144,3 +149,38 @@ class Video:
         else:
 
             print("No resizing needed")
+    def getYUVPixel(self, frame, l, c):
+        yf=self.frameY[frame]
+        uf=self.frameU[frame]
+        vf=self.frameV[frame]
+        p=yf[l,c], uf[l,c], vf[l,c]
+        #print(p)
+        return p
+    
+    def iterate(self):
+        l=len(self.frameY)
+        delta=128
+        l=1
+        for frame in range(0,l):
+            print(frame)
+            rgb=np.zeros(shape=(self.height,self.width,3), dtype=np.uint8)
+            for line in range(0,self.height):
+                for column in range(0,self.width):
+                    p=self.getYUVPixel(frame,line,column)
+                    r=p[0]+1.403*(p[2]-delta)
+                    g=p[0]-0.714*(p[2]-delta)-0.344*(p[1]-delta)
+                    b=p[0]+1.773*(p[1]-delta)
+                    rgb[line,column] = r,g,b
+                    #print(r,g,b)
+                    #print(frame,line,column)
+
+        self.frameRGB+=[rgb]
+
+
+    def printrgb(self):
+        for frame in self.frameRGB:
+            print(frame)
+    def bruh(self):
+        a=Image.fromarray(self.frameRGB[0])
+        a.show()
+

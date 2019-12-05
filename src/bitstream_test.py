@@ -8,7 +8,11 @@ if __name__ == '__main__':
     # Writing a few random bits to a file
     chars = '01010101'
     for c in chars:
-        bts.writebits(ord(c), 1)
+       bts.writebits(int(c, 2), 1)
+
+    # Equivalent to
+    # c = '01010101'
+    # bts.writebits(int(c,2), len(c))
 
     # Writing 255 using 9 bits (first will be left as 0)
     bts.write_n_bits(255, 9)
