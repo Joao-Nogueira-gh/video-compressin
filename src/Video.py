@@ -71,9 +71,9 @@ class Video:
                 self.frameU+=[u]
                 self.frameV+=[v]
                 
-                print(y, len(y),c, end='\n\n')
-                print(u, len(u),c, end='\n\n')
-                print(v, len(v),c, end='\n\n')
+                # print(y, len(y),c, end='\n\n')
+                # print(u, len(u),c, end='\n\n')
+                # print(v, len(v),c, end='\n\n')
 
             c+=1
 
@@ -143,12 +143,15 @@ class Video:
         # Resize arrays
         if self.colorSpace != '4:4:4':
 
-            self.frameU = cv2.resize(self.frameU, (len(self.frameY), len(self.frameY[0])))
-            self.frameV = cv2.resize(self.frameV, (len(self.frameY), len(self.frameY[0])))
+            for i in range(0, len(self.frameU)):
+                self.frameU[i] = cv2.resize(self.frameU[i], (self.width, self.height))
+                self.frameV[i] = cv2.resize(self.frameV[i], (self.width, self.height))
 
         else:
 
             print("No resizing needed")
+
+
     def getYUVPixel(self, frame, l, c):
         yf=self.frameY[frame]
         uf=self.frameU[frame]
@@ -158,6 +161,7 @@ class Video:
         return p
     
     def iterate(self):
+        self.resize()
         l=len(self.frameY)
         delta=128
         l=1
