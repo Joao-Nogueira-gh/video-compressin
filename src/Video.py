@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 from PIL import Image
+import math
 
 class Video:
 
@@ -19,7 +20,12 @@ class Video:
         self.frameU=[]
         #
         self.frameRGB=[]
-    def play_video(self):
+
+        #calls read video on initialization
+        self.read_video()
+
+    #regular video playing from opencv, not used
+    def old_play_video(self):
         cap = cv2.VideoCapture(self.vid)
 
         while(cap.isOpened()):
@@ -50,7 +56,7 @@ class Video:
                 self.fps=int((fields[3])[1:3])
 
                 self.getColorSpace(fields)
-                print(self.width, self.height, self.fps, self.colorSpace, self.frameLength, self.shape, 'line ',1)
+                print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength,'line ',1)
             
             # Rest of the video
             if c>=2:
@@ -77,7 +83,8 @@ class Video:
 
             c+=1
 
-        #print('500 = 50fps * 10 SeemsGood')
+        self.TotalFrames=len(self.frameY)
+
         f.close()
 
 
@@ -125,17 +132,17 @@ class Video:
     def print(self):
         c=1
         for x in self.frameY:
-            print(x, len(x[0]),len(x), c,'y' ,end='\n\n')
+            print(x, 'colunas=',len(x[0]),'linhas=',len(x), 'frame=',c,'y' ,end='\n\n')
             if c==1: break
             c+=1
         c=1
         for x in self.frameU:
-            print(x, len(x[0]),len(x),c, 'u', end='\n\n')
+            print(x,'colunas=',len(x[0]),'linhas=',len(x), 'frame=',c,'u' ,end='\n\n')
             if c==1: break
             c+=1
         c=1
         for x in self.frameV:
-            print(x, len(x[0]),len(x),c, 'v', end='\n\n')
+            print(x, 'colunas=',len(x[0]),'linhas=',len(x), 'frame=',c,'v' ,end='\n\n')
             if c==1: break
             c+=1
 
@@ -156,17 +163,23 @@ class Video:
         yf=self.frameY[frame]
         uf=self.frameU[frame]
         vf=self.frameV[frame]
+        if self.colorSpace=='4:2:2':
+            c=math.floor((c/2))
+        elif self.colorSpace=='4:2:0':
+            c=math.floor((c/2))
+            l=math.floor((l/2))
+
         p=yf[l,c], uf[l,c], vf[l,c]
-        #print(p)
         return p
     
-    def iterate(self):
+    def convertToRgb(self, frameNumber):
+
         self.resize()
-        l=len(self.frameY)
+
+        #repare bem isto está um bocado hardcoded
         delta=128
-        l=1
-        for frame in range(0,l):
-            print(frame)
+        for frame in range(0,frameNumber):
+            print('processing frame ',frame)
             rgb=np.zeros(shape=(self.height,self.width,3), dtype=np.uint8)
             for line in range(0,self.height):
                 for column in range(0,self.width):
@@ -175,16 +188,38 @@ class Video:
                     g=p[0]-0.714*(p[2]-delta)-0.344*(p[1]-delta)
                     b=p[0]+1.773*(p[1]-delta)
                     rgb[line,column] = r,g,b
-                    #print(r,g,b)
-                    #print(frame,line,column)
-
-        self.frameRGB+=[rgb]
+            self.frameRGB+=[rgb]
 
 
     def printrgb(self):
         for frame in self.frameRGB:
             print(frame)
-    def bruh(self):
-        a=Image.fromarray(self.frameRGB[0])
-        a.show()
+
+    def play_video(self, frameNumber=None):
+        if frameNumber==None:
+            frameNumber=self.TotalFrames
+
+        self.convertToRgb(frameNumber)
+
+        print('a mostrar ',frameNumber, ' imagens/frames,', len(self.frameRGB))
+        
+        # for frame in self.frameRGB:
+        #     a=Image.fromarray(frame)
+        #     a.show()
+
+        # woooooooooooo
+        for frame in self.frameRGB:
+            RGB_img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            cv2.imshow('Video',RGB_img)
+            cv2.waitKey(2000)
+
+    def encode_video(self):
+        print(len(self.frameY),len(self.frameU),len(self.frameV))
+        for frame in range(0,self.TotalFrames):
+            print('processing frame ',frame)
+            for line in range(0,self.height):
+                for column in range(0,self.width):
+                    #print(frame,line,column)
+                    p=self.getYUVPixel(frame,line,column)
+            #each loop
 
