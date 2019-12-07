@@ -159,15 +159,16 @@ class Video:
             print("No resizing needed")
 
 
-    def getYUVPixel(self, frame, l, c):
+    def getYUVPixel(self, frame, l, c, resized):
         yf=self.frameY[frame]
         uf=self.frameU[frame]
         vf=self.frameV[frame]
-        if self.colorSpace=='4:2:2':
-            c=math.floor((c/2))
-        elif self.colorSpace=='4:2:0':
-            c=math.floor((c/2))
-            l=math.floor((l/2))
+        if resized==False:
+            if self.colorSpace=='4:2:2':
+                c=math.floor((c/2))
+            elif self.colorSpace=='4:2:0':
+                c=math.floor((c/2))
+                l=math.floor((l/2))
 
         p=yf[l,c], uf[l,c], vf[l,c]
         return p
@@ -183,7 +184,7 @@ class Video:
             rgb=np.zeros(shape=(self.height,self.width,3), dtype=np.uint8)
             for line in range(0,self.height):
                 for column in range(0,self.width):
-                    p=self.getYUVPixel(frame,line,column)
+                    p=self.getYUVPixel(frame,line,column, resized=True)
                     r=p[0]+1.403*(p[2]-delta)
                     g=p[0]-0.714*(p[2]-delta)-0.344*(p[1]-delta)
                     b=p[0]+1.773*(p[1]-delta)
@@ -220,6 +221,6 @@ class Video:
             for line in range(0,self.height):
                 for column in range(0,self.width):
                     #print(frame,line,column)
-                    p=self.getYUVPixel(frame,line,column)
+                    p=self.getYUVPixel(frame,line,column, resized=False)
             #each loop
 
