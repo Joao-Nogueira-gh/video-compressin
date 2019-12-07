@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 from PIL import Image
 import math
+from Golomb import *
+from Bitstream import *
 
 class Video:
 
@@ -50,6 +52,7 @@ class Video:
                 #print(line)
                 line=line.decode(self.encoding)
                 fields=line.split(" ")
+                self.header=line.strip()
 
                 self.width=int((fields[1])[1:])
                 self.height=int((fields[2])[1:])
@@ -214,13 +217,80 @@ class Video:
             cv2.imshow('Video',RGB_img)
             cv2.waitKey(2000)
 
-    def encode_video(self):
-        print(len(self.frameY),len(self.frameU),len(self.frameV))
-        for frame in range(0,self.TotalFrames):
+    def encode_video(self, filename):
+        l=self.TotalFrames
+        l=1
+        m=4
+        g=Golomb(4)
+        #b=BitStream()
+        f=open(filename,'w')
+        f.write('ENCODED '+self.header+' '+str(m)+'\n')
+        for frame in range(0,l):
             print('processing frame ',frame)
             for line in range(0,self.height):
                 for column in range(0,self.width):
-                    #print(frame,line,column)
                     p=self.getYUVPixel(frame,line,column, resized=False)
-            #each loop
+                    if line==0 or column==0:
+                        newP=''
+                        for pp in p:
+                            newP+=g.encode(pp)+','
+                        f.write(newP[:-1]+';')
+                    else:
+                        a=self.getYUVPixel(frame,line,column-1, resized=False)
+                        c=self.getYUVPixel(frame,line-1,column-1, resized=False)
+                        b=self.getYUVPixel(frame,line-1,column, resized=False)
+                        x=self.predict(a,c,b)
+                        erro=self.diff(p,x)
+                        #print(p,x,erro)
+                        newP=''
+                        for pp in erro:
+                            newP+=g.encode(pp)+','
+                        f.write(newP[:-1]+';')
+                f.write('\n')
+        
+    def predict(self,a,c,b):
+        y=[int(a[0]),int(c[0]),int(b[0])]
+        u=[int(a[1]),int(c[1]),int(b[1])]
+        v=[int(a[2]),int(c[2]),int(b[2])]
+        # y=[a[0],c[0],b[0]]
+        # u=[a[1],c[1],b[1]]
+        # v=[a[2],c[2],b[2]]
+        l=[y]+[u]+[v]
+        ret=[]
+        for component in l:
+            if component[1]>=max(component[0],component[2]):
+                x=min(component[0],component[2])
+            elif component[1]<=min(component[0],component[2]):
+                x=min(component[0],component[2])
+            else:
+                x=component[0]+component[2]-component[1]
+            ret.append(x)
+        return ret
+
+    def diff(self,p,x):
+        ey=p[0]-x[0]
+        eu=p[1]-x[1]
+        ev=p[2]-x[2]
+        # ey=p[0]-x[0]
+        # eu=p[1]-x[1]
+        # ev=p[2]-x[2]
+        # ey=int(p[0])-int(x[0])
+        # eu=int(p[1])-int(x[1])
+        # ev=int(p[2])-int(x[2])
+        return(ey,eu,ev)
+
+    def printPixels(self):
+        l=self.TotalFrames
+        l=1
+        h=self.height
+        h=2
+        w=self.width
+        #w=2
+        for frame in range(0,l):
+            print('processing frame ',frame)
+            for line in range(0,h):
+                for column in range(0,w):
+                    p=self.getYUVPixel(frame,line,column, resized=False)
+                    print(p, end=';')
+                print('\n\n')
 
