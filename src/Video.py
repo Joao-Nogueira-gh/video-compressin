@@ -183,7 +183,7 @@ class Video:
         #repare bem isto está um bocado hardcoded
         delta=128
         for frame in range(0,frameNumber):
-            print('processing frame ',frame)
+            print('processing frame',frame)
             rgb=np.zeros(shape=(self.height,self.width,3), dtype=np.uint8)
             for line in range(0,self.height):
                 for column in range(0,self.width):
@@ -205,7 +205,7 @@ class Video:
 
         self.convertToRgb(frameNumber)
 
-        print('a mostrar ',frameNumber, ' imagens/frames,', len(self.frameRGB))
+        print('a mostrar',frameNumber, 'imagens/frames,', len(self.frameRGB))
         
         # for frame in self.frameRGB:
         #     a=Image.fromarray(frame)
@@ -222,19 +222,23 @@ class Video:
         l=1
         m=4
         g=Golomb(4)
-        #b=BitStream()
-        f=open(filename,'w')
-        f.write('ENCODED '+self.header+' '+str(m)+'\n')
+        bs=BitStream(filename,'WRITE')
+        #f=open(filename,'w')
+        header='ENCODED '+self.header+' '+str(m)+'\n'
+        #f.write(header)
+        bs.writeTxt(header)
         for frame in range(0,l):
-            print('processing frame ',frame)
+            print('processing frame',frame)
             for line in range(0,self.height):
                 for column in range(0,self.width):
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     if line==0 or column==0:
-                        newP=''
-                        for pp in p:
-                            newP+=g.encode(pp)+','
-                        f.write(newP[:-1]+';')
+                        for i in range(0,len(p)):
+                            n=g.encode(p[i])
+                            bs.writebits(int(n,2),len(n))
+                            if i!=(len(p)-1):
+                                bs.writeTxt(' ')
+                        bs.writeTxt(';')
                     else:
                         a=self.getYUVPixel(frame,line,column-1, resized=False)
                         c=self.getYUVPixel(frame,line-1,column-1, resized=False)
@@ -242,11 +246,14 @@ class Video:
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
                         #print(p,x,erro)
-                        newP=''
-                        for pp in erro:
-                            newP+=g.encode(pp)+','
-                        f.write(newP[:-1]+';')
-                f.write('\n')
+                        for i in range(0,len(erro)):
+                            n=g.encode(erro[i])
+                            bs.writebits(int(n,2),len(n))
+                            if i!=(len(erro)-1):
+                                bs.writeTxt(' ')
+                        bs.writeTxt(';')
+            bs.writeTxt('\n')
+        bs.close()
         
     def predict(self,a,c,b):
         y=[int(a[0]),int(c[0]),int(b[0])]
@@ -287,10 +294,24 @@ class Video:
         w=self.width
         #w=2
         for frame in range(0,l):
-            print('processing frame ',frame)
+            print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     print(p, end=';')
                 print('\n\n')
+
+    def decodeFile(self,filename):
+        f=open(filename,'rb')
+        c=1
+        for line in f:
+            if c==1:
+                print(line)
+            else:
+                campos=line.decode('utf-8', errors='ignore')
+                campos=campos.split(';')
+                print(len(campos))
+            c+=1
+        #print(c)
+        #print(self.height)
 

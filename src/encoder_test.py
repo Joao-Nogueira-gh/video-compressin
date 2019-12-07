@@ -6,6 +6,7 @@ if __name__ == "__main__":
     v3="../res/ducks_take_off_420_720p50.y4m"
     v=Video(v1)
     #v.printPixels()
-    v.encode_video('encoded')
+    #v.encode_video('encoded')
+    v.decodeFile('encoded')
 
 

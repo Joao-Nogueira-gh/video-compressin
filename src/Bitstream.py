@@ -137,3 +137,9 @@ class BitStream:
             self.out.close()
         elif self.mode == "READ":
             self.input.close()
+    
+    def writeTxt(self,txt):
+        txt=bytearray(txt, encoding='utf-8')
+        self.out.write(txt)
+    def readTxt(self,txt):
+        txt=txt.decode('utf-8')
