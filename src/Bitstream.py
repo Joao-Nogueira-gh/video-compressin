@@ -139,7 +139,25 @@ class BitStream:
             self.input.close()
     
     def writeTxt(self,txt):
-        txt=bytearray(txt, encoding='utf-8')
-        self.out.write(txt)
-    def readTxt(self,txt):
-        txt=txt.decode('utf-8')
+        self.out.write(bytearray(txt, encoding='utf-8'))
+        self.write_accumulator = 0
+        self.write_bcount = 0
+
+    def readStuff(self, stuff):
+        chars = []
+        for i in range(0, len(stuff)):
+            x=self._readbit2(stuff[i])
+            chars.append(str(x))
+
+        return ''.join(chars)
+
+    def _readbit2(self,bit):
+        if not self.read_bcount:
+            a = bit
+            if a:
+                self.read_accumulator = ord(a)
+            self.read_bcount = 8
+            self.read = len(a)
+        rv = (self.read_accumulator & (1 << self.read_bcount-1)) >> self.read_bcount-1
+        self.read_bcount -= 1
+        return rv

@@ -231,6 +231,7 @@ class Video:
             print('processing frame',frame)
             for line in range(0,self.height):
                 for column in range(0,self.width):
+                    #print('c=',column)
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     if line==0 or column==0:
                         for i in range(0,len(p)):
@@ -238,7 +239,6 @@ class Video:
                             bs.writebits(int(n,2),len(n))
                             if i!=(len(p)-1):
                                 bs.writeTxt(' ')
-                        bs.writeTxt(';')
                     else:
                         a=self.getYUVPixel(frame,line,column-1, resized=False)
                         c=self.getYUVPixel(frame,line-1,column-1, resized=False)
@@ -251,8 +251,8 @@ class Video:
                             bs.writebits(int(n,2),len(n))
                             if i!=(len(erro)-1):
                                 bs.writeTxt(' ')
-                        bs.writeTxt(';')
-            bs.writeTxt('\n')
+                    bs.writeTxt(';')
+            bs.writeTxt('FRAME')
         bs.close()
         
     def predict(self,a,c,b):
@@ -290,28 +290,50 @@ class Video:
         l=self.TotalFrames
         l=1
         h=self.height
-        h=2
+        h=1
         w=self.width
-        #w=2
+        w=1
         for frame in range(0,l):
-            print('processing frame',frame)
+            #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     print(p, end=';')
-                print('\n\n')
+                print('\n')
 
     def decodeFile(self,filename):
+        bs=BitStream('coiso','READ')
+        g=Golomb(4)
         f=open(filename,'rb')
-        c=1
+        c=0
         for line in f:
-            if c==1:
-                print(line)
-            else:
+            c+=1
+            if c==2:
+                if c==3:
+                    break
                 campos=line.decode('utf-8', errors='ignore')
                 campos=campos.split(';')
-                print(len(campos))
-            c+=1
-        #print(c)
+                print('len=',len(campos), c)
+                for x in campos:
+                    subf=x.split(' ')
+                    #print('len=',len(subf))
+                    for i in range(0,len(subf)):
+                        print(len(subf))
+                        coiso=subf[i]
+                        print(coiso, len(coiso))
+                        cars=bs.readStuff(coiso)
+                        print('cars=',cars)
+                        de=g.decode(cars)
+                        print(de)
+
+
+                        if i==0:#y
+                            pass
+                        elif i==1:#u
+                            pass
+                        elif i==2:#v
+                            pass
+        print('total lines=',c)
         #print(self.height)
+        bs.close()
 
