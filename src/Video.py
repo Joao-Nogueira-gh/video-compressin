@@ -220,25 +220,28 @@ class Video:
     def encode_video(self, filename):
         l=self.TotalFrames
         l=1
+
         m=4
-        g=Golomb(4)
+        g=Golomb(m)
+
         bs=BitStream(filename,'WRITE')
-        #f=open(filename,'w')
-        header='ENCODED '+self.header+' '+str(m)+'\n'
-        #f.write(header)
+
+        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:8 v2:4'
+        headerlen=len(header)
+        bs.write_n_bits(headerlen,8)
         bs.writeTxt(header)
+
         for frame in range(0,l):
             print('processing frame',frame)
             for line in range(0,self.height):
                 for column in range(0,self.width):
-                    #print('c=',column)
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     if line==0 or column==0:
                         for i in range(0,len(p)):
-                            n=g.encode(p[i])
-                            bs.writebits(int(n,2),len(n))
-                            if i!=(len(p)-1):
-                                bs.writeTxt(' ')
+                            #n=g.encode(p[i])
+                            n="{0:b}".format(p[i])
+                            #print(n,' vs ',sequence)
+                            bs.writebits(int(n,2),8)
                     else:
                         a=self.getYUVPixel(frame,line,column-1, resized=False)
                         c=self.getYUVPixel(frame,line-1,column-1, resized=False)
@@ -247,12 +250,10 @@ class Video:
                         erro=self.diff(p,x)
                         #print(p,x,erro)
                         for i in range(0,len(erro)):
-                            n=g.encode(erro[i])
-                            bs.writebits(int(n,2),len(n))
-                            if i!=(len(erro)-1):
-                                bs.writeTxt(' ')
-                    bs.writeTxt(';')
-            bs.writeTxt('FRAME')
+                            #n=g.encode(erro[i])
+                            n="{0:b}".format(erro[i])
+                            #print(n,' vs ',sequence)
+                            bs.writebits(int(n,2),4)
         bs.close()
         
     def predict(self,a,c,b):
@@ -290,50 +291,67 @@ class Video:
         l=self.TotalFrames
         l=1
         h=self.height
-        h=1
+        h=3
         w=self.width
-        w=1
+        w=20
         for frame in range(0,l):
             #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
-                    p=self.getYUVPixel(frame,line,column, resized=False)
-                    print(p, end=';')
+                    if line==2 and 10<column<17:
+                        p=self.getYUVPixel(frame,line,column, resized=False)
+                        print(p, end=';')
                 print('\n')
 
     def decodeFile(self,filename):
-        bs=BitStream('coiso','READ')
-        g=Golomb(4)
-        f=open(filename,'rb')
-        c=0
-        for line in f:
-            c+=1
-            if c==2:
-                if c==3:
-                    break
-                campos=line.decode('utf-8', errors='ignore')
-                campos=campos.split(';')
-                print('len=',len(campos), c)
-                for x in campos:
-                    subf=x.split(' ')
-                    #print('len=',len(subf))
-                    for i in range(0,len(subf)):
-                        print(len(subf))
-                        coiso=subf[i]
-                        print(coiso, len(coiso))
-                        cars=bs.readStuff(coiso)
-                        print('cars=',cars)
-                        de=g.decode(cars)
-                        print(de)
+        bs=BitStream(filename,'READ')
+        headerlen=bs.read_n_bits(8)
 
+        chars=[]
+        for i in range(0,headerlen*8):
+            chars.append(str(bs._readbit()))
 
-                        if i==0:#y
-                            pass
-                        elif i==1:#u
-                            pass
-                        elif i==2:#v
-                            pass
-        print('total lines=',c)
-        #print(self.height)
+        res=''.join(chars)
+        header=self.decode_binary_string(res)
+        print(header)
+
+        #handle header
+        headerfields=header.split(' ')
+        width=0
+        for field in headerfields:
+            if field[0]=='W':
+                width=int(field[1:])
+            elif field[0]=='G':
+                m=int(field[-1:])
+            elif field[1]=='1':
+                v1=int(field[3])
+            elif field[1]=='2':
+                v2=int(field[3])
+            elif field[0]=='H':
+                height=int(field[1:])
+            elif field[0]=='F':
+                fps=int(field[1:3])
+            elif field[0]=='C':
+                cs=field[1:]
+        print(m,v1,v2, height,width,fps,cs)
+        #
+        g=Golomb(m)
+
+        #
+        for frame in range(0,1):
+            for line in range(0, height):
+                for column in range(0,width):
+                    pixel=[]
+                    for component in range(0,3):
+                        if line==0 or column==0:
+                            n=bs.read_n_bits(v1)
+                        else:
+                            n=bs.read_n_bits(v2)
+                        pixel.append(n)
+                    print(pixel)
+        #
         bs.close()
+
+    def decode_binary_string(self,s):
+        return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
 
