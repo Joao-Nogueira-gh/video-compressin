@@ -7,7 +7,7 @@ from Bitstream import *
 
 class Video:
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, mode):
 
         # High Level Video Playing
         self.vid = file_name
@@ -23,8 +23,12 @@ class Video:
         #
         self.frameRGB=[]
 
+        self.encoded=False
+
+        np.seterr(over='ignore')
+
         #calls read video on initialization
-        self.read_video()
+        self.read_video(mode)
 
     #regular video playing from opencv, not used
     def old_play_video(self):
@@ -41,96 +45,169 @@ class Video:
         cap.release()
         cv2.destroyAllWindows()
 
-    def read_video(self):
-        f=open(self.vid,"rb")
-        c=1
+    def handleHeader(self):
+        print(self.header)
+        fields=self.header.split(" ")
 
-        for line in f:
+        for field in fields:
+            c=field[0]
+            if c=='W':
+                self.width=int(field[1:])
+            elif c=='H':
+                self.height=int(field[1:])
+            elif c=='F':
+                self.fps=int(field[1:3])
+            elif c=='C':
+                self.colorSpace=int(field[1:])
+                self.computeShape()
+            elif c=='G':
+                self.golombParam=int(field[-1:])
+                self.encoded=True
+            elif c=='v':
+                if field[1]=='1':
+                    self.v1=int(field[3])
+                else:
+                    self.v2=int(field[3])
+            elif c=='z':
+                self.TotalFrames=int(field[1:])
+                    
 
-            # Processing header
-            if c==1:
-                #print(line)
-                line=line.decode(self.encoding)
-                fields=line.split(" ")
-                self.header=line.strip()
+        print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength)
+        if self.encoded:
+            print(self.golombParam,self.v1,self.v2,self.TotalFrames)
 
-                self.width=int((fields[1])[1:])
-                self.height=int((fields[2])[1:])
-                self.fps=int((fields[3])[1:3])
+    def read_video(self, mode):
+        if mode=='normal':
+            f=open(self.vid,"rb")
+            c=1
 
-                self.getColorSpace(fields)
-                print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength,'line ',1)
+            for line in f:
+
+                # Processing header
+                if c==1:
+                    line=line.decode(self.encoding)
+                    self.header=line.strip()
+                    self.handleHeader()
+                
+                # Rest of the video
+                if c>=2:
+
+                    frameY=f.read(self.yLength)
+                    frameU=f.read(self.uLength)
+                    frameV=f.read(self.vLength)
+
+                    y=np.frombuffer(frameY, dtype=np.uint8)
+                    u=np.frombuffer(frameU, dtype=np.uint8)
+                    v=np.frombuffer(frameV, dtype=np.uint8)
+
+                    y=y.reshape(self.shape)
+                    u=u.reshape(self.other_shape)
+                    v=v.reshape(self.other_shape)
+
+                    self.frameY+=[y]
+                    self.frameU+=[u]
+                    self.frameV+=[v]
+                    
+                    # print(y, len(y),c, end='\n\n')
+                    # print(u, len(u),c, end='\n\n')
+                    # print(v, len(v),c, end='\n\n')
+
+                c+=1
+
+            self.TotalFrames=len(self.frameY)
+
+            f.close()
+
+        elif mode=='intra_encoding':
+            bs=BitStream(self.vid,'READ')
+            headerlen=bs.read_n_bits(8)
+
+            chars=[]
+            for i in range(0,headerlen*8):
+                chars.append(str(bs._readbit()))
+
+            res=''.join(chars)
+            self.header=self.decode_binary_string(res)
+
+            #handle header
+            self.handleHeader()
             
-            # Rest of the video
-            if c>=2:
+            g=Golomb(self.golombParam)
 
-                frameY=f.read(self.yLength)
-                frameU=f.read(self.uLength)
-                frameV=f.read(self.vLength)
+            l=self.TotalFrames
+            l=1
+            #
+            for frame in range(0,l):
 
-                y=np.frombuffer(frameY, dtype=np.uint8)
-                u=np.frombuffer(frameU, dtype=np.uint8)
-                v=np.frombuffer(frameV, dtype=np.uint8)
+                y=np.zeros(shape=self.shape,dtype=np.uint8)
+                u=np.zeros(shape=self.other_shape,dtype=np.uint8)
+                v=np.zeros(shape=self.other_shape,dtype=np.uint8)
 
-                y=y.reshape(self.shape)
-                u=u.reshape(self.other_shape)
-                v=v.reshape(self.other_shape)
+                
+                for line in range(0, self.height):
+                    for column in range(0,self.width):
+                        if line==0 or column==0:
+                            cy=bs.read_n_bits(self.v1)
+                            cu=bs.read_n_bits(self.v1)
+                            cv=bs.read_n_bits(self.v1)
+                            pixel=[cy,cu,cv]
+                        else:
+                            #was predicted
+                            cy=bs.read_n_bits(self.v2)
+                            cu=bs.read_n_bits(self.v2)
+                            cv=bs.read_n_bits(self.v2)
+                            
+                            erro=[cy,cu,cv]
+                            if line==1 and column==1:
+                                print(erro)
+                            mat=[]
+                            mat+=[y]
+                            mat+=[u]
+                            mat+=[v]
+                            a=self.getYUVPixel(frame,line,column-1, resized=False, mat=mat)
+                            c=self.getYUVPixel(frame,line-1,column-1, resized=False, mat=mat)
+                            b=self.getYUVPixel(frame,line-1,column, resized=False, mat=mat)
+                            x=self.predict(a,c,b)
+                            pixel=self.sum(x,erro)
+
+                        y[line,column]=pixel[0]
+                        u[line,column]=pixel[1]
+                        v[line,column]=pixel[2]
 
                 self.frameY+=[y]
                 self.frameU+=[u]
                 self.frameV+=[v]
-                
-                # print(y, len(y),c, end='\n\n')
-                # print(u, len(u),c, end='\n\n')
-                # print(v, len(v),c, end='\n\n')
-
-            c+=1
-
-        self.TotalFrames=len(self.frameY)
-
-        f.close()
+            #
+            bs.close()
+        elif mode=='hybrid_encoding':
+            pass
+        else:
+            print('unknown mode, shutting down')
+            exit(0)
 
 
-    def getColorSpace(self,fields):
+    def computeShape(self):      
+        if self.colorSpace==444:
+            self.colorSpace='4:4:4'
+            self.frameLength=int(self.width*self.height*3)
+            self.yLength=self.uLength=self.vLength=int(self.frameLength/3)
+            self.shape = (int(self.height), self.width)
+            self.other_shape = (int(self.height), self.width)
 
-        for x in fields:
-
-            if x[0]=='C':
-                c=x[1:4]
-                
-                if c=='444':
-                    self.colorSpace='4:4:4'
-                    self.frameLength=int(self.width*self.height*3)
-                    self.yLength=self.uLength=self.vLength=int(self.frameLength/3)
-                    self.shape = (int(self.height), self.width)
-                    self.other_shape = (int(self.height), self.width)
-                    return
-
-                elif c=='422':
-                    self.colorSpace='4:2:2'
-                    self.frameLength=int(self.width*self.height*2)
-                    self.yLength=int(self.frameLength/2)
-                    self.vLength=self.uLength=int(self.frameLength/4)
-                    self.shape = (int(self.height), self.width)
-                    self.other_shape = (int(self.height), int(self.width/2))
-                    return
-                
-                elif c=='420':
-                    self.colorSpace='4:2:0'
-                    self.frameLength=int(self.width*self.height*3/2)
-                    self.yLength=int(self.frameLength*(2/3))
-                    self.uLength=self.vLength=int(self.frameLength*(1/6))
-                    self.shape = (int(self.height), self.width)
-                    self.other_shape = (int(self.height/2), int(self.width/2))
-                    return
-
-        # If no condition was fullfilled, assume the default   
-        self.colorSpace='4:2:0'
-        self.frameLength=int(self.width*self.height*3/2)
-        self.yLength=int(self.frameLength*(2/3))
-        self.uLength=self.vLength=int(self.frameLength*(1/6))
-        self.shape = (int(self.height), self.width)
-        self.other_shape = (int(self.height/2), int(self.width/2))
+        elif self.colorSpace==422:
+            self.colorSpace='4:2:2'
+            self.frameLength=int(self.width*self.height*2)
+            self.yLength=int(self.frameLength/2)
+            self.vLength=self.uLength=int(self.frameLength/4)
+            self.shape = (int(self.height), self.width)
+            self.other_shape = (int(self.height), int(self.width/2))
+        else: 
+            self.colorSpace='4:2:0'
+            self.frameLength=int(self.width*self.height*3/2)
+            self.yLength=int(self.frameLength*(2/3))
+            self.uLength=self.vLength=int(self.frameLength*(1/6))
+            self.shape = (int(self.height), self.width)
+            self.other_shape = (int(self.height/2), int(self.width/2))
 
     def print(self):
         c=1
@@ -162,10 +239,15 @@ class Video:
             print("No resizing needed")
 
 
-    def getYUVPixel(self, frame, l, c, resized):
-        yf=self.frameY[frame]
-        uf=self.frameU[frame]
-        vf=self.frameV[frame]
+    def getYUVPixel(self, frame, l, c, resized, mat=None):
+        if mat==None:
+            yf=self.frameY[frame]
+            uf=self.frameU[frame]
+            vf=self.frameV[frame]
+        else:
+            yf=mat[0]
+            uf=mat[1]
+            vf=mat[2]
         if resized==False:
             if self.colorSpace=='4:2:2':
                 c=math.floor((c/2))
@@ -226,7 +308,7 @@ class Video:
 
         bs=BitStream(filename,'WRITE')
 
-        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:8 v2:4'
+        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:8 v2:8 z'+str(self.TotalFrames)
         headerlen=len(header)
         bs.write_n_bits(headerlen,8)
         bs.writeTxt(header)
@@ -248,21 +330,23 @@ class Video:
                         b=self.getYUVPixel(frame,line-1,column, resized=False)
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
+                        if line==1 and column==1:
+                            print(erro)
                         #print(p,x,erro)
                         for i in range(0,len(erro)):
                             #n=g.encode(erro[i])
                             n="{0:b}".format(erro[i])
                             #print(n,' vs ',sequence)
-                            bs.writebits(int(n,2),4)
+                            bs.writebits(int(n,2),8)
         bs.close()
         
     def predict(self,a,c,b):
-        y=[int(a[0]),int(c[0]),int(b[0])]
-        u=[int(a[1]),int(c[1]),int(b[1])]
-        v=[int(a[2]),int(c[2]),int(b[2])]
-        # y=[a[0],c[0],b[0]]
-        # u=[a[1],c[1],b[1]]
-        # v=[a[2],c[2],b[2]]
+        # y=[int(a[0]),int(c[0]),int(b[0])]
+        # u=[int(a[1]),int(c[1]),int(b[1])]
+        # v=[int(a[2]),int(c[2]),int(b[2])]
+        y=[a[0],c[0],b[0]]
+        u=[a[1],c[1],b[1]]
+        v=[a[2],c[2],b[2]]
         l=[y]+[u]+[v]
         ret=[]
         for component in l:
@@ -286,6 +370,17 @@ class Video:
         # eu=int(p[1])-int(x[1])
         # ev=int(p[2])-int(x[2])
         return(ey,eu,ev)
+    def sum(self,p,x):
+        ey=p[0]+x[0]
+        eu=p[1]+x[1]
+        ev=p[2]+x[2]
+        # ey=p[0]-x[0]
+        # eu=p[1]-x[1]
+        # ev=p[2]-x[2]
+        # ey=int(p[0])-int(x[0])
+        # eu=int(p[1])-int(x[1])
+        # ev=int(p[2])-int(x[2])
+        return(ey,eu,ev)
 
     def printPixels(self):
         l=self.TotalFrames
@@ -298,59 +393,10 @@ class Video:
             #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
-                    if line==2 and 10<column<17:
+                    if line==1 and 0<=column<10:
                         p=self.getYUVPixel(frame,line,column, resized=False)
                         print(p, end=';')
                 print('\n')
-
-    def decodeFile(self,filename):
-        bs=BitStream(filename,'READ')
-        headerlen=bs.read_n_bits(8)
-
-        chars=[]
-        for i in range(0,headerlen*8):
-            chars.append(str(bs._readbit()))
-
-        res=''.join(chars)
-        header=self.decode_binary_string(res)
-        print(header)
-
-        #handle header
-        headerfields=header.split(' ')
-        width=0
-        for field in headerfields:
-            if field[0]=='W':
-                width=int(field[1:])
-            elif field[0]=='G':
-                m=int(field[-1:])
-            elif field[1]=='1':
-                v1=int(field[3])
-            elif field[1]=='2':
-                v2=int(field[3])
-            elif field[0]=='H':
-                height=int(field[1:])
-            elif field[0]=='F':
-                fps=int(field[1:3])
-            elif field[0]=='C':
-                cs=field[1:]
-        print(m,v1,v2, height,width,fps,cs)
-        #
-        g=Golomb(m)
-
-        #
-        for frame in range(0,1):
-            for line in range(0, height):
-                for column in range(0,width):
-                    pixel=[]
-                    for component in range(0,3):
-                        if line==0 or column==0:
-                            n=bs.read_n_bits(v1)
-                        else:
-                            n=bs.read_n_bits(v2)
-                        pixel.append(n)
-                    print(pixel)
-        #
-        bs.close()
 
     def decode_binary_string(self,s):
         return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))

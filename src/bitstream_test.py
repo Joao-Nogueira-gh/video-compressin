@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # bts.writebits(int(c,2), len(c))
 
     # Writing 255 using 9 bits (first will be left as 0)
-    bts.write_n_bits(255, 9)
+    bts.write_n_bits(126, 8)
     
     # Closing file - mandatory if we wish to perform different operations
     bts.close()
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     print(''.join(chars))
 
     # Reading the value stored in the NEXT 9 bits (should be the 255 we wrote)
-    print(bts.read_n_bits(9))
+    print(bts.read_n_bits(8))
 
     # Closing file - not mandatory, but good practice
     bts.close()

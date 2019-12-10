@@ -10,8 +10,11 @@ if __name__ == '__main__':
     bts = BitStream("testing", "WRITE")
 
     l=[]
-    l.append('11111111010')
-    l.append('111111111111111111111111111111100')
+    n1=n="{0:b}".format(5)
+    n2=n="{0:b}".format(-5)
+    print(n1,n2)
+    l.append(n1)
+    l.append(n2)
     l.append('1111111111111111111111111111111101')
     comp=len(header)
     print(comp)
@@ -57,3 +60,10 @@ if __name__ == '__main__':
             print(res,x)
 
     bts.close()
+
+    r1=g.encode(5)
+    r2=g.encode(-5)
+    print(r1,r2)
+    r3=g.decode(r1)
+    r4=g.decode(r2)
+    print(r3,r4)
