@@ -67,3 +67,11 @@ if __name__ == '__main__':
     r3=g.decode(r1)
     r4=g.decode(r2)
     print(r3,r4)
+
+    # bts = BitStream("testing", "WRITE")
+    # bts.write_n_bits(,1)
+    # bts.close()
+    # bts = BitStream("testing", "READ")
+    # x=bts.read_n_bits(1)
+    # print(x)
+    # bts.close()

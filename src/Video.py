@@ -74,7 +74,7 @@ class Video:
 
         print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength)
         if self.encoded:
-            print(self.golombParam,self.v1,self.v2,self.TotalFrames)
+            print('g=',self.golombParam,'v1=',self.v1,'v2=',self.v2,self.TotalFrames)
 
     def read_video(self, mode):
         if mode=='normal':
@@ -153,13 +153,23 @@ class Video:
                             pixel=[cy,cu,cv]
                         else:
                             #was predicted
+                            #ay=bs.read_n_bits(1)
                             cy=bs.read_n_bits(self.v2)
+                            #au=bs.read_n_bits(1)
                             cu=bs.read_n_bits(self.v2)
+                            #av=bs.read_n_bits(1)
                             cv=bs.read_n_bits(self.v2)
                             
+                            # if ay==1:
+                            #     cy=cy*-1
+                            # if au==1:
+                            #     cu=cu*-1
+                            # if av==1:
+                            #     cv=cv*-1
                             erro=[cy,cu,cv]
-                            if line==1 and column==1:
-                                print(erro)
+                            #if line==1  and 0<=column<12:
+                                #print('af',erro, end=';')
+                            
                             mat=[]
                             mat+=[y]
                             mat+=[u]
@@ -330,30 +340,38 @@ class Video:
                         b=self.getYUVPixel(frame,line-1,column, resized=False)
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
-                        if line==1 and column==1:
-                            print(erro)
+                        for x in erro:
+                            if x>100:
+                                print(erro)
                         #print(p,x,erro)
+                        if line==1  and 0<=column<12:
+                            print(erro, end=';')
                         for i in range(0,len(erro)):
+                            n=erro[i]
+                            # if erro[i]<0:
+                            #     n=erro[i]*-1
+                            #     bs.writebits(1,1)
+                            # else:
+                            #     bs.writebits(0,1)
                             #n=g.encode(erro[i])
-                            n="{0:b}".format(erro[i])
-                            #print(n,' vs ',sequence)
+                            n="{0:b}".format(n)
                             bs.writebits(int(n,2),8)
         bs.close()
         
     def predict(self,a,c,b):
-        # y=[int(a[0]),int(c[0]),int(b[0])]
-        # u=[int(a[1]),int(c[1]),int(b[1])]
-        # v=[int(a[2]),int(c[2]),int(b[2])]
-        y=[a[0],c[0],b[0]]
-        u=[a[1],c[1],b[1]]
-        v=[a[2],c[2],b[2]]
+        y=[int(a[0]),int(c[0]),int(b[0])]
+        u=[int(a[1]),int(c[1]),int(b[1])]
+        v=[int(a[2]),int(c[2]),int(b[2])]
+        # y=[a[0],c[0],b[0]]
+        # u=[a[1],c[1],b[1]]
+        # v=[a[2],c[2],b[2]]
         l=[y]+[u]+[v]
         ret=[]
         for component in l:
             if component[1]>=max(component[0],component[2]):
                 x=min(component[0],component[2])
             elif component[1]<=min(component[0],component[2]):
-                x=min(component[0],component[2])
+                x=max(component[0],component[2])
             else:
                 x=component[0]+component[2]-component[1]
             ret.append(x)
@@ -386,18 +404,21 @@ class Video:
         l=self.TotalFrames
         l=1
         h=self.height
-        h=3
+        h=20
         w=self.width
         w=20
         for frame in range(0,l):
             #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
-                    if line==1 and 0<=column<10:
+                    if line in (17,18,19) and 0<=column<10:
                         p=self.getYUVPixel(frame,line,column, resized=False)
                         print(p, end=';')
-                print('\n')
+                print('')
 
     def decode_binary_string(self,s):
         return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
+
+    def getStuff(self):
+        return self.frameY, self.frameU,self.frameV
 
