@@ -133,11 +133,13 @@ class Video:
             self.handleHeader()
             
             g=Golomb(self.golombParam)
+            bitsResto=int(math.log(self.golombParam,2))
 
             l=self.TotalFrames
             l=1
             #
             for frame in range(0,l):
+                print('decoding frame',frame)
 
                 y=np.zeros(shape=self.shape,dtype=np.uint8)
                 u=np.zeros(shape=self.other_shape,dtype=np.uint8)
@@ -146,43 +148,54 @@ class Video:
                 
                 for line in range(0, self.height):
                     for column in range(0,self.width):
+                        #print(line,column)
                         if line==0 or column==0:
-                            cy=bs.read_n_bits(self.v1)
-                            cu=bs.read_n_bits(self.v1)
-                            cv=bs.read_n_bits(self.v1)
-                            pixel=[cy,cu,cv]
+                            pixel=[]
+                            for i in range(0,3):
+                                seq=''
+                                while True:
+                                    r=str(bs.read_n_bits(1))
+                                    seq+=r
+                                    #print(r)
+                                    if r=='0':
+                                        break
+                                seq+=str(bs.readbits(bitsResto))
+                                #print(seq)
+                                comp=g.decode(seq)
+                                pixel.append(comp)
                         else:
                             #was predicted
-                            #ay=bs.read_n_bits(1)
-                            cy=bs.read_n_bits(self.v2)
-                            #au=bs.read_n_bits(1)
-                            cu=bs.read_n_bits(self.v2)
-                            #av=bs.read_n_bits(1)
-                            cv=bs.read_n_bits(self.v2)
-                            
-                            # if ay==1:
-                            #     cy=cy*-1
-                            # if au==1:
-                            #     cu=cu*-1
-                            # if av==1:
-                            #     cv=cv*-1
-                            erro=[cy,cu,cv]
-                            #if line==1  and 0<=column<12:
-                                #print('af',erro, end=';')
+                            pixel=[]
+                            for i in range(0,3):
+                                ay=bs.read_n_bits(1)
+                                seq=''
+                                while True:
+                                    r=str(bs.read_n_bits(1))
+                                    seq+=r
+                                    if r=='0':
+                                        break
+                                seq+=str(bs.readbits(bitsResto))
+                                comp=g.decode(seq)
+                                if ay==1:
+                                    comp=comp*-1
+                                pixel.append(comp)
                             
                             mat=[]
                             mat+=[y]
                             mat+=[u]
                             mat+=[v]
+                            # if line==1 and 0<=column<10:
+                            #     print(pixel)
                             a=self.getYUVPixel(frame,line,column-1, resized=False, mat=mat)
                             c=self.getYUVPixel(frame,line-1,column-1, resized=False, mat=mat)
                             b=self.getYUVPixel(frame,line-1,column, resized=False, mat=mat)
                             x=self.predict(a,c,b)
-                            pixel=self.sum(x,erro)
+                            pixel=self.sum(x,pixel)
 
                         y[line,column]=pixel[0]
                         u[line,column]=pixel[1]
                         v[line,column]=pixel[2]
+                        #print(pixel)
 
                 self.frameY+=[y]
                 self.frameU+=[u]
@@ -275,7 +288,7 @@ class Video:
         #repare bem isto está um bocado hardcoded
         delta=128
         for frame in range(0,frameNumber):
-            print('processing frame',frame)
+            print('converting frame',frame,'to rgb')
             rgb=np.zeros(shape=(self.height,self.width,3), dtype=np.uint8)
             for line in range(0,self.height):
                 for column in range(0,self.width):
@@ -318,44 +331,51 @@ class Video:
 
         bs=BitStream(filename,'WRITE')
 
-        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:8 v2:8 z'+str(self.TotalFrames)
+        v1=8
+        v2=8
+
+        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:'+str(v1)+' v2:'+str(v2)+' z'+str(self.TotalFrames)
         headerlen=len(header)
         bs.write_n_bits(headerlen,8)
         bs.writeTxt(header)
 
         for frame in range(0,l):
-            print('processing frame',frame)
+            print('encoding frame',frame)
             for line in range(0,self.height):
                 for column in range(0,self.width):
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     if line==0 or column==0:
                         for i in range(0,len(p)):
-                            #n=g.encode(p[i])
-                            n="{0:b}".format(p[i])
+                            n=g.encode(p[i])
+                            #n="{0:b}".format(p[i])
                             #print(n,' vs ',sequence)
-                            bs.writebits(int(n,2),8)
+                            bs.writebits(int(n,2),len(n))
                     else:
                         a=self.getYUVPixel(frame,line,column-1, resized=False)
                         c=self.getYUVPixel(frame,line-1,column-1, resized=False)
                         b=self.getYUVPixel(frame,line-1,column, resized=False)
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
-                        for x in erro:
-                            if x>100:
-                                print(erro)
                         #print(p,x,erro)
-                        if line==1  and 0<=column<12:
-                            print(erro, end=';')
+                        # if line==1  and 0<=column<12:
+                        #     print(erro, end=';')
+                        # if line==1 and 0<=column<10:
+                        #     print(erro)
                         for i in range(0,len(erro)):
-                            n=erro[i]
-                            # if erro[i]<0:
-                            #     n=erro[i]*-1
-                            #     bs.writebits(1,1)
-                            # else:
-                            #     bs.writebits(0,1)
-                            #n=g.encode(erro[i])
-                            n="{0:b}".format(n)
-                            bs.writebits(int(n,2),8)
+                            if erro[i]<0:
+                                n=erro[i]*-1
+                                bs.writebits(1,1)
+                            else:
+                                bs.writebits(0,1)
+                                n=erro[i]
+                            
+                            n=g.encode(n)
+                            #go=g.encode(n)
+                            #n="{0:b}".format(n)
+                            #print(n)
+                            # if len(go)<len(n):
+                            #     print(go,n, 'here')
+                            bs.writebits(int(n,2),len(n))
         bs.close()
         
     def predict(self,a,c,b):
@@ -411,10 +431,10 @@ class Video:
             #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
-                    if line in (17,18,19) and 0<=column<10:
+                    if line==1 and 0<=column<10:
                         p=self.getYUVPixel(frame,line,column, resized=False)
                         print(p, end=';')
-                print('')
+                #print('')
 
     def decode_binary_string(self,s):
         return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))

@@ -2,6 +2,9 @@ from Golomb import *
 
 def main():
     g=Golomb(4)
+    x=g.encode(9)
+    #print(x)
+    exit(0)
     f=open("../res/testFile.txt","r")
     o=open("../res/encodedTestFile.txt","w")
     a=open("../res/decodedTestFile.txt","w")

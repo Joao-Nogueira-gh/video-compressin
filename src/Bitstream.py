@@ -79,7 +79,7 @@ class BitStream:
     # \param[out] values of bits read from file
     def readbits(self, n):
         chars = []
-        for i in range(0, 8):
+        for i in range(0, n):
             chars.append(str(self._readbit()))
 
         return ''.join(chars)
@@ -98,7 +98,7 @@ class BitStream:
             print("Error: Cannot write "+str(value)+" with as little as " + str(nbits) + " bits")
             exit(0)
 
-        for i in range(nbits-1, -1, -1): # -1 -1, tem bue -1s idk achei piada xd
+        for i in range(nbits-1, -1, -1):
             if i >= len(b):
                 self._writebit(0)
             else:

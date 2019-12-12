@@ -37,6 +37,7 @@ class Golomb:
         #print(q,r)
         un=self.convertToUnary(q)
         bn=self.convertToBinary(r)
+        #print('q',un,'-r',bn)
         code=un+bn
         #print('encoded to',code, type(code))
         return code
@@ -88,6 +89,12 @@ class Golomb:
         if self.standardM:
             sequence="{0:b}".format(number) #alternative para retirar 0b
             #print(sequence)
+            nb=int(math.log(self.factor,2))
+            dif=nb-len(sequence)
+            #print(dif)
+            if dif!=0:
+                for i in range(0,dif):
+                    sequence='0'+sequence
             return sequence
         else:
             sequence=truncated_binary_encoding(number,self.factor)
