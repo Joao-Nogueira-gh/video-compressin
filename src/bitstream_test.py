@@ -4,13 +4,6 @@ if __name__ == '__main__':
 
 
     bts = BitStream("../res/output_bits.dat", "WRITE")
-    x='10'
-    bts.writebits(int(x,2),len(x))
-    bts.close()
-    bts = BitStream("../res/output_bits.dat", "READ")
-    r=bts.readbits(2)
-    print(r)
-    exit(0)
     
     # Writing a few random bits to a file
     chars = '01010101'

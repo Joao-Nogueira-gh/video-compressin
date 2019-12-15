@@ -24,6 +24,7 @@ class Video:
         self.frameRGB=[]
 
         self.encoded=False
+        self.colorSpace=None
 
         np.seterr(over='ignore')
 
@@ -59,22 +60,16 @@ class Video:
                 self.fps=int(field[1:3])
             elif c=='C':
                 self.colorSpace=int(field[1:])
-                self.computeShape()
             elif c=='G':
                 self.golombParam=int(field[-1:])
                 self.encoded=True
-            elif c=='v':
-                if field[1]=='1':
-                    self.v1=int(field[3])
-                else:
-                    self.v2=int(field[3])
             elif c=='z':
                 self.TotalFrames=int(field[1:])
                     
-
+        self.computeShape()
         print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength)
         if self.encoded:
-            print('g=',self.golombParam,'v1=',self.v1,'v2=',self.v2,self.TotalFrames)
+            print('g=',self.golombParam, 'totalframes=',self.TotalFrames)
 
     def read_video(self, mode):
         if mode=='normal':
@@ -138,17 +133,19 @@ class Video:
             l=self.TotalFrames
             l=1
             #
+            self.frameY=[None]*l
+            self.frameU=[None]*l
+            self.frameV=[None]*l
+            #
             for frame in range(0,l):
                 print('decoding frame',frame)
 
                 y=np.zeros(shape=self.shape,dtype=np.uint8)
                 u=np.zeros(shape=self.other_shape,dtype=np.uint8)
                 v=np.zeros(shape=self.other_shape,dtype=np.uint8)
-
                 
                 for line in range(0, self.height):
                     for column in range(0,self.width):
-                        #print(line,column)
                         if line==0 or column==0:
                             pixel=[]
                             for i in range(0,3):
@@ -179,34 +176,48 @@ class Video:
                                 if ay==1:
                                     comp=comp*-1
                                 pixel.append(comp)
-                            
-                            mat=[]
-                            mat+=[y]
-                            mat+=[u]
-                            mat+=[v]
-                            # if line==1 and 0<=column<10:
-                            #     print(pixel)
-                            a=self.getYUVPixel(frame,line,column-1, resized=False, mat=mat)
-                            c=self.getYUVPixel(frame,line-1,column-1, resized=False, mat=mat)
-                            b=self.getYUVPixel(frame,line-1,column, resized=False, mat=mat)
+
+                            a=self.getYUVPixel(frame,line,column-1, resized=False)
+                            c=self.getYUVPixel(frame,line-1,column-1, resized=False)
+                            b=self.getYUVPixel(frame,line-1,column, resized=False)
                             x=self.predict(a,c,b)
                             pixel=self.sum(x,pixel)
 
-                        y[line,column]=pixel[0]
-                        u[line,column]=pixel[1]
-                        v[line,column]=pixel[2]
-                        #print(pixel)
+                        pixel=tuple(pixel)
 
+                        l,c=self.adjustCoord(line,column)
+
+                        y[line,column]=pixel[0]                        
+                        u[l,c]=pixel[1]
+                        v[l,c]=pixel[2]
+                        #
+                        self.frameY[frame]=y
+                        self.frameU[frame]=u
+                        self.frameV[frame]=v
+
+                #por cada frame
                 self.frameY+=[y]
                 self.frameU+=[u]
                 self.frameV+=[v]
             #
             bs.close()
+
         elif mode=='hybrid_encoding':
             pass
         else:
             print('unknown mode, shutting down')
             exit(0)
+
+    def adjustCoord(self,line,column):
+        if self.colorSpace=='4:2:2':
+            c=math.floor((column/2))
+            return line,c
+        elif self.colorSpace=='4:2:0':
+            c=math.floor((column/2))
+            l=math.floor((line/2))
+            return l,c
+        else:
+            return line,column
 
 
     def computeShape(self):      
@@ -262,23 +273,23 @@ class Video:
             print("No resizing needed")
 
 
-    def getYUVPixel(self, frame, l, c, resized, mat=None):
-        if mat==None:
-            yf=self.frameY[frame]
-            uf=self.frameU[frame]
-            vf=self.frameV[frame]
-        else:
-            yf=mat[0]
-            uf=mat[1]
-            vf=mat[2]
+    def getYUVPixel(self, frame, line, column, resized):
+        yf=self.frameY[frame]
+        uf=self.frameU[frame]
+        vf=self.frameV[frame]
+
         if resized==False:
             if self.colorSpace=='4:2:2':
-                c=math.floor((c/2))
+                c=math.floor((column/2))
+                p=yf[line,column], uf[line,c], vf[line,c]
             elif self.colorSpace=='4:2:0':
-                c=math.floor((c/2))
-                l=math.floor((l/2))
-
-        p=yf[l,c], uf[l,c], vf[l,c]
+                c=math.floor((column/2))
+                l=math.floor((line/2))
+                p=yf[line,column], uf[l,c], vf[l,c]
+            else:
+                p=yf[line,column], uf[line,column], vf[line,column]
+        else:
+            p=yf[line,column], uf[line,column], vf[line,column]
         return p
     
     def convertToRgb(self, frameNumber):
@@ -331,10 +342,7 @@ class Video:
 
         bs=BitStream(filename,'WRITE')
 
-        v1=8
-        v2=8
-
-        header='ENCODED '+self.header+' Golomb'+str(m)+' v1:'+str(v1)+' v2:'+str(v2)+' z'+str(self.TotalFrames)
+        header='ENCODED '+self.header+' Golomb'+str(m)+' z'+str(self.TotalFrames)
         headerlen=len(header)
         bs.write_n_bits(headerlen,8)
         bs.writeTxt(header)
@@ -346,6 +354,7 @@ class Video:
                     p=self.getYUVPixel(frame,line,column, resized=False)
                     if line==0 or column==0:
                         for i in range(0,len(p)):
+                            
                             n=g.encode(p[i])
                             #n="{0:b}".format(p[i])
                             #print(n,' vs ',sequence)
@@ -356,11 +365,7 @@ class Video:
                         b=self.getYUVPixel(frame,line-1,column, resized=False)
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
-                        #print(p,x,erro)
-                        # if line==1  and 0<=column<12:
-                        #     print(erro, end=';')
-                        # if line==1 and 0<=column<10:
-                        #     print(erro)
+
                         for i in range(0,len(erro)):
                             if erro[i]<0:
                                 n=erro[i]*-1
@@ -424,14 +429,14 @@ class Video:
         l=self.TotalFrames
         l=1
         h=self.height
-        h=20
+        #h=20
         w=self.width
-        w=20
+        #w=20
         for frame in range(0,l):
             #print('processing frame',frame)
             for line in range(0,h):
                 for column in range(0,w):
-                    if line==1 and 0<=column<10:
+                    if line==0 and w-10<=column<w:
                         p=self.getYUVPixel(frame,line,column, resized=False)
                         print(p, end=';')
                 #print('')
