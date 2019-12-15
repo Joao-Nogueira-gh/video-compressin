@@ -1,11 +1,5 @@
 import math
 
-#external library that implements truncated binary encoding
-from truncated_binary_encoding import truncated_binary_encoding
-
-#TODO: how to calculate optimal M?
-#TODO:cant revert truncated binary encoding...
-
 ## \class Golomb 
 # Basic implementation of an encoder/decoder using Golomb Codes
 # \author Tiago Melo 89005
@@ -97,14 +91,5 @@ class Golomb:
                     sequence='0'+sequence
             return sequence
         else:
-            sequence=truncated_binary_encoding(number,self.factor)
-            # b=math.log(self.factor,2)
-            # b=math.ceil(b)
-            # if number<b:
-            #     #less bits
-            #     pass
-            # else:
-            #     #more bits
-            #     pass
-            #print("truncated",sequence)
-            return sequence
+            print('not implemented for m!=2^x')
+            exit(0)

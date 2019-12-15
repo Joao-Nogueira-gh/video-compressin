@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     m1,m2,m3=v.getStuff()
 
-    v.encode_video('encoded')
+    v.encode_video('encoded', q=2)
 
     encodVid=Video('encoded','intra_encoding')
     m4,m5,m6=encodVid.getStuff()
