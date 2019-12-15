@@ -6,7 +6,23 @@ if __name__ == "__main__":
     v2="../res/ducks_take_off_422_720p50.y4m"	
     v3="../res/ducks_take_off_420_720p50.y4m"
     v=Video(v3,'normal')
+    b=v.getBlocks(0,80)#mdc
+    #wowwwwwwwwwwwwwww
+    #the thing is, it returns
+    # 80,80 80,80 80,80
+    # 80,80 80,40 80,40
+    # 80,80 40,40 40,40
+    # which is 'right', but, not really
+    for i in b:
+        #print(i)
+        #i has len1, tuple of 3 arrays, y u v
+        #print(len(i),i)
+        y=i[0]
+        u=i[1]
+        v=i[2]
+        print(y.shape,u.shape,v.shape)
 
+    exit(0)
     m1,m2,m3=v.getStuff()
 
     v.encode_video('encoded')

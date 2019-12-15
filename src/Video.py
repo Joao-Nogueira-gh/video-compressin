@@ -69,6 +69,10 @@ class Video:
             elif c=='q':
                 self.cutFactor=int(field[1:])
                 self.cut=True
+            elif c=='b':
+                self.block_size=int(field[1:])
+            elif c=='s':
+                self.search_area=int(field[1:])
                     
         self.computeShape()
         print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength)
@@ -494,4 +498,102 @@ class Video:
 
     def getStuff(self):
         return self.frameY, self.frameU,self.frameV
+
+    def getBlock(self,firstPixel,length,frame):
+        yuv=[]
+        l,c=firstPixel
+        fl,fc=l+length,c+length
+        y=self.frameY[frame]
+        y=y[l:fl,c:fc]
+        l,c=self.adjustCoord(l,c)
+        fl,fc=self.adjustCoord(fl,fc)
+        u=self.frameU[frame]
+        u=u[l:fl,c:fc]
+        v=self.frameV[frame]
+        v=v[l:fl,c:fc]
+
+        # yuv.append(y)
+        # yuv.append(u)
+        # yuv.append(v)
+        yuv=y,u,v
+
+        return yuv
+
+    def getBlocks(self,frame,block_size):
+        firstPixel=[0,0]
+        blocks=[]
+        while True:
+            if firstPixel[0]==self.height:
+                break
+            yuv=self.getBlock(firstPixel,block_size,frame)
+            blocks.append(yuv)
+            firstPixel[1]=firstPixel[1]+block_size
+            if firstPixel[1]==self.width:
+                firstPixel[1]=0
+                firstPixel[0]=firstPixel[0]+block_size
+        return blocks
+
+
+    def hybrid_encoding(self, filename,block_size, search_area, q=None):
+        l=self.TotalFrames
+        l=2
+
+        m=4
+        g=Golomb(m)
+
+        bs=BitStream(filename,'WRITE')
+
+        header='ENCODED '+self.header+' Golomb'+str(m)+' z'+str(self.TotalFrames)+' b'+str(block_size)+' s'+str(search_area)
+        if q!=None:
+            header+=' q'+str(q)
+        headerlen=len(header)
+        bs.write_n_bits(headerlen,8)
+        bs.writeTxt(header)
+
+        for frame in range(0,l):
+            print('encoding frame',frame)
+            if frame==0:
+                for line in range(0,self.height):
+                    for column in range(0,self.width):
+                        p=self.getYUVPixel(frame,line,column, resized=False)
+                        # if line==0 or column==0:
+                        #     for i in range(0,len(p)):
+                        #         n=p[i]
+                        #         n=g.encode(n)
+                        #         #n="{0:b}".format(p[i])
+                        #         #print(n,' vs ',sequence)
+                        #         bs.writebits(int(n,2),len(n))
+                        # else:
+                        a=self.getYUVPixel(frame,line,column-1, resized=False)
+                        c=self.getYUVPixel(frame,line-1,column-1, resized=False)
+                        b=self.getYUVPixel(frame,line-1,column, resized=False)
+                        x=self.predict(a,c,b)
+                        erro=self.diff(p,x)
+
+                        for i in range(0,len(erro)):
+                            if erro[i]<0:
+                                n=erro[i]*-1
+                                bs.writebits(1,1)
+                            else:
+                                bs.writebits(0,1)
+                                n=erro[i]
+                            
+                            if q!=None:
+                                #this stuff isnt really working, also needed to downgrade numpy version
+                                #value=p[i]+(n*q)
+                                #self.updateYUVPixel(i,frame,line,column,value)
+                                n=math.floor(n/q)
+                            n=g.encode(n)
+                            #go=g.encode(n)
+                            #n="{0:b}".format(n)
+                            #print(n)
+                            # if len(go)<len(n):
+                            #     print(go,n, 'here')
+                            bs.writebits(int(n,2),len(n))
+            else:
+                blocks=self.getBlocks(frame,block_size)
+
+            
+        bs.close()
+
 
