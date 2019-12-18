@@ -7,4 +7,4 @@ if __name__ == "__main__":
     v3="../res/ducks_take_off_420_720p50.y4m"
     v=Video(v1,'normal')
     #argument->number of video frames to play
-    v.play_video(1)
+    v.play_video(frameNumber=3)

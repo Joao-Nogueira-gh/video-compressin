@@ -1,13 +1,12 @@
 import numpy as np
 import cv2
-from PIL import Image
 import math
 from Golomb import *
 from Bitstream import *
 
 class Video:
 
-    def __init__(self, file_name, mode):
+    def __init__(self, file_name, mode, limitFrames=None):
 
         # High Level Video Playing
         self.vid = file_name
@@ -30,7 +29,7 @@ class Video:
         np.seterr(over='ignore')
 
         #calls read video on initialization
-        self.read_video(mode)
+        self.read_video(mode, limitFrames)
 
     #regular video playing from opencv, not used
     def old_play_video(self):
@@ -81,7 +80,7 @@ class Video:
         if self.cut:
             print('q=',self.cutFactor)
 
-    def read_video(self, mode):
+    def read_video(self, mode, limitFrames=None):
         if mode=='normal':
             f=open(self.vid,"rb")
             c=1
@@ -140,8 +139,10 @@ class Video:
             g=Golomb(self.golombParam)
             bitsResto=int(math.log(self.golombParam,2))
 
-            l=self.TotalFrames
-            l=1
+            if limitFrames==None:
+                l=self.TotalFrames
+            else:
+                l=limitFrames
             #
             self.frameY=[None]*l
             self.frameU=[None]*l
@@ -156,38 +157,7 @@ class Video:
                 
                 for line in range(0, self.height):
                     for column in range(0,self.width):
-                        # if line==0 or column==0:
-                        #     pixel=[]
-                        #     for i in range(0,3):
-                        #         seq=''
-                        #         while True:
-                        #             r=str(bs.read_n_bits(1))
-                        #             seq+=r
-                        #             #print(r)
-                        #             if r=='0':
-                        #                 break
-                        #         seq+=str(bs.readbits(bitsResto))
-                        #         #print(seq)
-                        #         comp=g.decode(seq)
-                        #         pixel.append(comp)
-                        # else:
-                        #was predicted
-                        pixel=[]
-                        for i in range(0,3):
-                            ay=bs.read_n_bits(1)
-                            seq=''
-                            while True:
-                                r=str(bs.read_n_bits(1))
-                                seq+=r
-                                if r=='0':
-                                    break
-                            seq+=str(bs.readbits(bitsResto))
-                            comp=g.decode(seq)
-                            if ay==1:
-                                comp=comp*-1
-                            if self.cut:
-                                comp=comp*self.cutFactor
-                            pixel.append(comp)
+                        pixel=self.decodeWithBitstream(3,bs,g,bitsResto)
 
                         a=self.getYUVPixel(frame,line,column-1, resized=False)
                         c=self.getYUVPixel(frame,line-1,column-1, resized=False)
@@ -215,7 +185,91 @@ class Video:
             bs.close()
 
         elif mode=='hybrid_encoding':
-            pass
+            bs=BitStream(self.vid,'READ')
+            headerlen=bs.read_n_bits(8)
+
+            chars=[]
+            for i in range(0,headerlen*8):
+                chars.append(str(bs._readbit()))
+
+            res=''.join(chars)
+            self.header=self.decode_binary_string(res)
+
+            #handle header
+            self.handleHeader()
+            
+            g=Golomb(self.golombParam)
+            bitsResto=int(math.log(self.golombParam,2))
+
+            if limitFrames==None:
+                l=self.TotalFrames
+            else:
+                l=limitFrames
+            #
+            self.frameY=[None]*l
+            self.frameU=[None]*l
+            self.frameV=[None]*l
+            #
+            for frame in range(0,l):
+                print('decoding frame',frame)
+
+                y=np.zeros(shape=self.shape,dtype=np.uint8)
+                u=np.zeros(shape=self.other_shape,dtype=np.uint8)
+                v=np.zeros(shape=self.other_shape,dtype=np.uint8)
+
+                if frame==0:
+                
+                    for line in range(0, self.height):
+                        for column in range(0,self.width):
+                            pixel=self.decodeWithBitstream(3,bs,g,bitsResto)
+
+                            a=self.getYUVPixel(frame,line,column-1, resized=False)
+                            c=self.getYUVPixel(frame,line-1,column-1, resized=False)
+                            b=self.getYUVPixel(frame,line-1,column, resized=False)
+                            x=self.predict(a,c,b)
+                            pixel=self.sum(x,pixel)
+
+                            pixel=tuple(pixel)
+
+                            l,c=self.adjustCoord(line,column)
+
+                            y[line,column]=pixel[0]                        
+                            u[l,c]=pixel[1]
+                            v[l,c]=pixel[2]
+                            #
+                            self.frameY[frame]=y
+                            self.frameU[frame]=u
+                            self.frameV[frame]=v
+
+                else:
+                    blocks=self.getBlocks(frame-1,self.block_size)
+                    bl,bc=blocks.shape
+                    for i1 in range(0,bl):
+                        for i2 in range(0,bc):
+                            vetor=self.decodeWithBitstream(2,bs,g,bitsResto)
+                            v1,v2=vetor
+                            #print(vetor)
+                            bestBlock=blocks[v1,v2]
+                            for l in range(0,self.block_size):
+                                for c in range(0,self.block_size):
+                                    pixelErro=self.decodeWithBitstream(3,bs,g,bitsResto)
+                                    referencePixel=bestBlock[l,c]
+                                    pixel=self.sum(pixelErro,referencePixel)
+
+                                    line,column=self.block_size*i1+l,self.block_size*i2+c           
+                                    li,co=self.adjustCoord(line,column)
+
+                                    y[line,column]=pixel[0]                        
+                                    u[li,co]=pixel[1]
+                                    v[li,co]=pixel[2]
+
+
+
+                    self.frameY[frame]=y
+                    self.frameU[frame]=u
+                    self.frameV[frame]=v
+            #
+            bs.close()
         else:
             print('unknown mode, shutting down')
             exit(0)
@@ -367,10 +421,6 @@ class Video:
         self.convertToRgb(frameNumber)
 
         print('a mostrar',frameNumber, 'imagens/frames,', len(self.frameRGB))
-        
-        # for frame in self.frameRGB:
-        #     a=Image.fromarray(frame)
-        #     a.show()
 
         # woooooooooooo
         for frame in self.frameRGB:
@@ -378,9 +428,11 @@ class Video:
             cv2.imshow('Video',RGB_img)
             cv2.waitKey(2000)
 
-    def encode_video(self, filename, q=None):
-        l=self.TotalFrames
-        l=1
+    def encode_video(self, filename, q=None, limitFrames=None):
+        if limitFrames==None:
+            l=self.TotalFrames
+        else:
+            l=limitFrames
 
         m=4
         g=Golomb(m)
@@ -413,26 +465,7 @@ class Video:
                     x=self.predict(a,c,b)
                     erro=self.diff(p,x)
 
-                    for i in range(0,len(erro)):
-                        if erro[i]<0:
-                            n=erro[i]*-1
-                            bs.writebits(1,1)
-                        else:
-                            bs.writebits(0,1)
-                            n=erro[i]
-                        
-                        if q!=None:
-                            #this stuff isnt really working, also needed to downgrade numpy version
-                            #value=p[i]+(n*q)
-                            #self.updateYUVPixel(i,frame,line,column,value)
-                            n=math.floor(n/q)
-                        n=g.encode(n)
-                        #go=g.encode(n)
-                        #n="{0:b}".format(n)
-                        #print(n)
-                        # if len(go)<len(n):
-                        #     print(go,n, 'here')
-                        bs.writebits(int(n,2),len(n))
+                    self.encodeWithBitstream(erro,bs,g,q)
         bs.close()
         
     def predict(self,a,c,b):
@@ -455,15 +488,13 @@ class Video:
         return ret
 
     def diff(self,p,x):
-        ey=p[0]-x[0]
-        eu=p[1]-x[1]
-        ev=p[2]-x[2]
         # ey=p[0]-x[0]
         # eu=p[1]-x[1]
         # ev=p[2]-x[2]
-        # ey=int(p[0])-int(x[0])
-        # eu=int(p[1])-int(x[1])
-        # ev=int(p[2])-int(x[2])
+
+        ey=int(p[0])-int(x[0])
+        eu=int(p[1])-int(x[1])
+        ev=int(p[2])-int(x[2])
         return(ey,eu,ev)
     def sum(self,p,x):
         ey=p[0]+x[0]
@@ -500,43 +531,48 @@ class Video:
         return self.frameY, self.frameU,self.frameV
 
     def getBlock(self,firstPixel,length,frame):
-        yuv=[]
+        yuv=np.zeros(shape=(length,length,3), dtype=np.uint8)
         l,c=firstPixel
         fl,fc=l+length,c+length
-        y=self.frameY[frame]
-        y=y[l:fl,c:fc]
-        l,c=self.adjustCoord(l,c)
-        fl,fc=self.adjustCoord(fl,fc)
-        u=self.frameU[frame]
-        u=u[l:fl,c:fc]
-        v=self.frameV[frame]
-        v=v[l:fl,c:fc]
-
-        # yuv.append(y)
-        # yuv.append(u)
-        # yuv.append(v)
-        yuv=y,u,v
+        c1,c2=0,0
+        for line in range(l,fl):
+            for col in range(c,fc):
+                p=self.getYUVPixel(frame,line,col,resized=False)
+                #print(p)
+                yuv[c1,c2]=p
+                c2+=1
+            c1+=1
+            c2=0
+        
 
         return yuv
 
     def getBlocks(self,frame,block_size):
         firstPixel=[0,0]
-        blocks=[]
+        p1=int(self.height/block_size)
+        p2=int(self.width/block_size)
+        blocks=np.zeros(shape=(p1,p2), dtype=object)
+        c1,c2=0,0
         while True:
             if firstPixel[0]==self.height:
                 break
             yuv=self.getBlock(firstPixel,block_size,frame)
-            blocks.append(yuv)
+            blocks[c1,c2]=yuv
             firstPixel[1]=firstPixel[1]+block_size
+            c2+=1
             if firstPixel[1]==self.width:
                 firstPixel[1]=0
+                c2=0
                 firstPixel[0]=firstPixel[0]+block_size
+                c1+=1
         return blocks
 
 
-    def hybrid_encoding(self, filename,block_size, search_area, q=None):
-        l=self.TotalFrames
-        l=2
+    def hybrid_encoding(self, filename,block_size, search_area, q=None, limitFrames=None):
+        if limitFrames==None:
+            l=self.TotalFrames
+        else:
+            l=limitFrames
 
         m=4
         g=Golomb(m)
@@ -570,30 +606,112 @@ class Video:
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
 
-                        for i in range(0,len(erro)):
-                            if erro[i]<0:
-                                n=erro[i]*-1
-                                bs.writebits(1,1)
-                            else:
-                                bs.writebits(0,1)
-                                n=erro[i]
-                            
-                            if q!=None:
-                                #this stuff isnt really working, also needed to downgrade numpy version
-                                #value=p[i]+(n*q)
-                                #self.updateYUVPixel(i,frame,line,column,value)
-                                n=math.floor(n/q)
-                            n=g.encode(n)
-                            #go=g.encode(n)
-                            #n="{0:b}".format(n)
-                            #print(n)
-                            # if len(go)<len(n):
-                            #     print(go,n, 'here')
-                            bs.writebits(int(n,2),len(n))
+                        self.encodeWithBitstream(erro,bs,g,q)
             else:
                 blocks=self.getBlocks(frame,block_size)
+                oldBlocks=self.getBlocks(frame-1,block_size)
+
+                bl,bc=blocks.shape
+                for l in range(0,bl):
+                    for c in range(0,bc):
+                        position=l,c
+                        block=blocks[l,c]
+                        bestblock,vetor=self.findBestBlock(block,oldBlocks,search_area,position)
+                        #write vetor
+                        self.encodeWithBitstream(vetor,bs,g,q)
+                        #write block
+                        nl,nc=bestblock.shape[0], bestblock.shape[1]
+                        for a in range(0,nl):
+                            for b in range(0,nc):
+                                self.encodeWithBitstream(bestblock[a,b],bs,g,q)
 
             
         bs.close()
 
+    def findBestBlock(self,block,oldBlocks,search_area,position):
+        vetor=None
+        flag=True
+        lastDif=None
+        ol,oc=position
+        bl,bc=oldBlocks.shape
+        #print(bl,bc)
+        for l in range(0,bl):
+            for c in range(0,bc):
+                if abs(ol-l)<=search_area and abs(oc-c)<=search_area:
+                    candidateBlock=oldBlocks[l,c]
+                    dif=self.blockDif(block,candidateBlock)
+                    if flag or self.lessError(dif,lastDif):
+                        flag=False
+                        lastDif=dif
+                        vetor=[l,c]
+        return lastDif,vetor
+
+
+    def blockDif(self,block,candidateBlock):
+        length=block.shape[0]
+        dif=np.zeros(shape=(length,length,3), dtype=np.int8)
+        for l in range(0,length):
+            for c in range(0,length):
+                dif[l,c]=self.diff(block[l,c],candidateBlock[l,c])
+        return dif
+
+    def lessError(self,dif,lastDif):
+        s1=0
+        s2=0
+        length=dif.shape[0]
+        for l in range(0,length):
+            for c in range(0,length):
+                p1=dif[l,c]
+                s1+=abs(int(p1[0]))+abs(int(p1[1]))+abs(int(p1[2]))
+                p2=lastDif[l,c]
+                s2+=abs(int(p2[0]))+abs(int(p2[1]))+abs(int(p2[2]))
+
+        if s1==0 or s2==0:
+            print('YOOOOOOOOOOOOO')
+
+        if s1<s2:
+            return True
+        else:
+            return False
+
+    def encodeWithBitstream(self, value,bs,g,q):
+        for i in range(0,len(value)):
+            if value[i]<0:
+                n=value[i]*-1
+                bs.writebits(1,1)
+            else:
+                bs.writebits(0,1)
+                n=value[i]
+            
+            if q!=None:
+                #this stuff isnt really working, also needed to downgrade numpy version
+                #value=p[i]+(n*q)
+                #self.updateYUVPixel(i,frame,line,column,value)
+                n=math.floor(n/q)
+            n=g.encode(n)
+            #go=g.encode(n)
+            #n="{0:b}".format(n)
+            #print(n)
+            # if len(go)<len(n):
+            #     print(go,n, 'here')
+            bs.writebits(int(n,2),len(n))
+
+    def decodeWithBitstream(self, len,bs,g,bitsResto):
+        pixel=[]
+        for i in range(0,len):
+            ay=bs.read_n_bits(1)
+            seq=''
+            while True:
+                r=str(bs.read_n_bits(1))
+                seq+=r
+                if r=='0':
+                    break
+            seq+=str(bs.readbits(bitsResto))
+            comp=g.decode(seq)
+            if ay==1:
+                comp=comp*-1
+            if self.cut:
+                comp=comp*self.cutFactor
+            pixel.append(comp)
+        return pixel
 
