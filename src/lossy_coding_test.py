@@ -2,7 +2,7 @@ from Video import Video
 from numpy import *
 
 if __name__ == "__main__":
-    numberoframes=3
+    numberoframes=2
 
     v1="../res/ducks_take_off_444_720p50.y4m"
     v2="../res/ducks_take_off_422_720p50.y4m"	
@@ -11,9 +11,9 @@ if __name__ == "__main__":
 
     m1,m2,m3=v.getStuff()
 
-    v.encode_video('lossy_encoded', q=2, limitFrames=numberoframes)
+    v.encode_video('../res/lossy_encoded', q=2, limitFrames=numberoframes)
 
-    encodVid=Video('lossy_encoded','intra_encoding', limitFrames=numberoframes)
+    encodVid=Video('../res/lossy_encoded','intra_encoding', limitFrames=numberoframes)
     m4,m5,m6=encodVid.getStuff()
     
     for i in range(0,numberoframes):

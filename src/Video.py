@@ -465,7 +465,7 @@ class Video:
                     x=self.predict(a,c,b)
                     erro=self.diff(p,x)
 
-                    self.encodeWithBitstream(erro,bs,g,q)
+                    self.encodeWithBitstream(erro,bs,g,q,pixel=p,frame=frame,line=line,column=column)
         bs.close()
         
     def predict(self,a,c,b):
@@ -606,7 +606,7 @@ class Video:
                         x=self.predict(a,c,b)
                         erro=self.diff(p,x)
 
-                        self.encodeWithBitstream(erro,bs,g,q)
+                        self.encodeWithBitstream(erro,bs,g,q,pixel=p,frame=frame,line=line,column=column)
             else:
                 blocks=self.getBlocks(frame,block_size)
                 oldBlocks=self.getBlocks(frame-1,block_size)
@@ -674,7 +674,7 @@ class Video:
         else:
             return False
 
-    def encodeWithBitstream(self, value,bs,g,q):
+    def encodeWithBitstream(self, value,bs,g,q, pixel=None, frame=None, line=None, column=None):
         for i in range(0,len(value)):
             if value[i]<0:
                 n=value[i]*-1
@@ -684,16 +684,10 @@ class Video:
                 n=value[i]
             
             if q!=None:
-                #this stuff isnt really working, also needed to downgrade numpy version
-                #value=p[i]+(n*q)
-                #self.updateYUVPixel(i,frame,line,column,value)
                 n=math.floor(n/q)
+                newValue=pixel[i]+(n*q)
+                #self.updateYUVPixel(i,frame,line,column,newValue)
             n=g.encode(n)
-            #go=g.encode(n)
-            #n="{0:b}".format(n)
-            #print(n)
-            # if len(go)<len(n):
-            #     print(go,n, 'here')
             bs.writebits(int(n,2),len(n))
 
     def decodeWithBitstream(self, len,bs,g,bitsResto):

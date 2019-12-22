@@ -1,2 +1,0 @@
-opencv-python
-pip3 install numpy==1.15.4

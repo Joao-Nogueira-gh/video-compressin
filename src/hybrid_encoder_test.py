@@ -2,16 +2,16 @@ from Video import Video
 from numpy import *
 
 if __name__ == "__main__":
-    numberoframes=3
+    numberoframes=2
     v1="../res/ducks_take_off_444_720p50.y4m"
     v2="../res/ducks_take_off_422_720p50.y4m"	
     v3="../res/ducks_take_off_420_720p50.y4m"
-    v=Video(v2,'normal')
-    v.hybrid_encoding('hybrid_encoded',block_size=80,search_area=1, limitFrames=numberoframes)
+    v=Video(v1,'normal')
+    v.hybrid_encoding('../res/hybrid_encoded',block_size=8,search_area=1, limitFrames=numberoframes)
     m1,m2,m3=v.getStuff()
 
 
-    encodVid=Video('hybrid_encoded','hybrid_encoding', limitFrames=numberoframes)
+    encodVid=Video('../res/hybrid_encoded','hybrid_encoding', limitFrames=numberoframes)
     m4,m5,m6=encodVid.getStuff()
     
     for i in range(0,numberoframes):
