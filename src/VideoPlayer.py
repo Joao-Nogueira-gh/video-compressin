@@ -1,27 +1,24 @@
+## @class VideoPlayer 
+# Module designed for reading video information and displaying it on screen using Python's opencv
+# Since the video format is YUV it has to be converted to RGB
+# @author Tiago Melo 89005
+# @author João Nogueira 89262
+
 import numpy as np
 import cv2
 import math
 
 class VideoPlayer:
-
+    ## Initialization function
+    # @param[in] filename Path of the file to read
+    # @param[in] imported A flag used to indicate if we are reading a saved video from a file, or importing the structures of one of our Codecs
+    # Initializing and setting up some useful parameters and flags
     def __init__(self, filename, imported=False):
-        if imported:
-            self.TotalFrames=filename.TotalFrames
-            self.frameRGB=[]
-            self.colorSpace=filename.colorSpace
-            self.frameY=filename.frameY
-            self.frameV=filename.frameV
-            self.frameU=filename.frameU
-            self.width=filename.width
-            self.height=filename.height
-
-        else:
-
+        if not imported:
             self.vid = filename
 
             self.esc = 'q'
 
-            # Reading video
             self.encoding='utf-8'
 
             # Array of arrays containing each frame's components
@@ -37,7 +34,18 @@ class VideoPlayer:
 
             #calls read video on initialization
             self.read_video()
+        else:
+            self.TotalFrames=filename.TotalFrames
+            self.frameRGB=[]
+            self.colorSpace=filename.colorSpace
+            self.frameY=filename.frameY
+            self.frameV=filename.frameV
+            self.frameU=filename.frameU
+            self.width=filename.width
+            self.height=filename.height
 
+    ## read_video function
+    # Reads YUV video information from file, storing all its data in our structures, calculating different components lengths and shapes
     def read_video(self):
         f=open(self.vid,"rb")
         c=1
@@ -75,6 +83,8 @@ class VideoPlayer:
 
         f.close()
 
+    ## handleHeader function
+    # Interpreting the header of the file, containing width, height, frames per second and color space, assigning them to class variables
     def handleHeader(self):
         print(self.header)
         fields=self.header.split(" ")
@@ -93,6 +103,8 @@ class VideoPlayer:
         self.computeShape()
         print('width=',self.width, 'height=',self.height, self.fps, self.colorSpace, self.frameLength)
 
+    ## computeShape function
+    # Calculating array shapes for YUV components based on the color space
     def computeShape(self):      
         if self.colorSpace==444:
             self.colorSpace='4:4:4'
@@ -116,6 +128,9 @@ class VideoPlayer:
             self.shape = (int(self.height), self.width)
             self.other_shape = (int(self.height/2), int(self.width/2))
 
+    ## resize function
+    # Resizing arrays so that they all share the same shape in 422 and 420 formats
+    # Makes use of Python's opencv method 'resize'
     def resize(self):
         # Resize arrays
         if self.colorSpace != '4:4:4':
@@ -130,6 +145,14 @@ class VideoPlayer:
             print("No resizing needed")
 
 
+    ## getYUVPixel function
+    # @param[in] frame Number of the frame from which to read the pixel from
+    # @param[in] line Line in which the pixel is located
+    # @param[in] column Column in which the pixel is located
+    # @param[in] resized A flag used to indicate if the arrays have been resized or not
+    # @param[out] p The pixel tuple in YUV format
+    # Returns 0,0,0 for non existent pixels, useful for the Codecs
+    # Adjust line and column numbers based on the color space (and array shapes)
     def getYUVPixel(self, frame, line, column, resized):
         yf=self.frameY[frame]
         uf=self.frameU[frame]
@@ -157,6 +180,9 @@ class VideoPlayer:
             p=yf[line,column], uf[line,column], vf[line,column]
         return p
     
+    ## getYUVPixel function
+    # @param[in] frameNumber Number of the frame to be converted to RGB
+    # Converts all the pixels in the desired frame to RGB format
     def convertToRgb(self, frameNumber):
 
         self.resize()
@@ -175,6 +201,10 @@ class VideoPlayer:
                     rgb[line,column] = r,g,b
             self.frameRGB+=[rgb]
 
+    ## getYUVPixel function
+    # @param[in] frameNumber Optional parameter to limit the number of frames to be shown (and converted)
+    # Currently showing frames with 1 second delay between each one for development purposes
+    # Can be altered be changing the value in 'cv2.waitKey(x)'
     def play_video(self, frameNumber=None):
         if frameNumber==None:
             frameNumber=self.TotalFrames

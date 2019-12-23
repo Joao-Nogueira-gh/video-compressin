@@ -1,17 +1,18 @@
-## \class BitStream
+## @class BitStream
 # Adaptation of already existing code to: support a single mode of file manipulation at a time,
 # write one bit to a file, read one bit from a file, write N bits to a file, read N bits from a
 # file, write value M using N bits to a file, read N bits from a file and the value these
 # correspond to.<br>
 # Every function aborts the program if it requires a different mode. For instance, if the function
 # _writebit() is called with Bitstream on READ mode. 
-# \author Tiago Melo 89005
-# \author João Nogueira 89262 
+# @author Tiago Melo 89005
+# @author João Nogueira 89262 
+
 class BitStream:
     def __init__(self, f, mode):
         ## Initialization function
-        # \param[in] file_name Name of the file that is going to be manipulated
-        # \param[in] mode Mode of manipulation (write/read)
+        # @param[in] file_name Name of the file that is going to be manipulated
+        # @param[in] mode Mode of manipulation (write/read)
         self.mode = mode
 
         if mode == "READ":
@@ -42,7 +43,7 @@ class BitStream:
 
 
     ## Write a single bit to self.file_name
-    # \param[in] value of the bit to be written to a file
+    # @param[in] value of the bit to be written to a file
     def _writebit(self, bit):
         if self.write_bcount == 8:
             self.flush()
@@ -52,7 +53,7 @@ class BitStream:
 
 
     ## Read a single bit from file
-    # \param[out] value of the bit read 
+    # @param[out] value of the bit read 
     def _readbit(self):
         if not self.read_bcount:
             a = self.input.read(1)
@@ -66,8 +67,8 @@ class BitStream:
 
 
     ## Write N bits to file
-    # \param[in] bits to be written to a file
-    # \param[in] number of bits to be written
+    # @param[in] bits to be written to a file
+    # @param[in] number of bits to be written
     def writebits(self, bits, n):
         while n > 0:
             self._writebit(bits & 1 << n-1)
@@ -75,8 +76,8 @@ class BitStream:
  
 
     ## Read N bits from a file
-    # \param[in] number of bits to be read from a file
-    # \param[out] values of bits read from file
+    # @param[in] number of bits to be read from a file
+    # @param[out] values of bits read from file
     def readbits(self, n):
         chars = []
         for i in range(0, n):
@@ -86,8 +87,8 @@ class BitStream:
 
 
     ## Write a given value using a certain number of bits to a file
-    # \param[in] value Value that is being written to a file
-    # \param[in] nbits Number of bits being used to write value
+    # @param[in] value Value that is being written to a file
+    # @param[in] nbits Number of bits being used to write value
     # Throws an error if value cannot be written using only nbits
     def write_n_bits(self, value, nbits):
         if self.mode != "WRITE":
@@ -106,7 +107,7 @@ class BitStream:
 
 
     ## Read the value corresponding to the next N bits of the file
-    # \param[in] nbits Number of bits that are going to be read from file
+    # @param[in] nbits Number of bits that are going to be read from file
     def read_n_bits(self, nbits):
         if self.mode != "READ":
             print("ERROR: Unsupported operation given the current mode (WRITE)")
@@ -138,6 +139,9 @@ class BitStream:
         elif self.mode == "READ":
             self.input.close()
     
+    ## Writing text (strings) using the Bitstream
+    # @param[in] txt String to be written
+    # Additional method that was not planned but was proven useful
     def writeTxt(self,txt):
         for c in txt:
             self.writebits(ord(c),8)
