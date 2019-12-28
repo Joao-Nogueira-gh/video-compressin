@@ -22,7 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Video Compressin&#39;
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
+   <div id="projectbrief">A Python-based video compressing and decompressing codec</div>
   </td>
  </tr>
  </tbody>
@@ -73,14 +75,11 @@ $(function() {
 <div class="title">Bitstream.BitStream Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p><a class="el" href="class_bitstream_1_1_bit_stream.html" title="BitStream class Supported methods: Writing one bit Reading one bit Writing n bits Reading n bits It i...">BitStream</a> class Supported methods: Writing one bit Reading one bit Writing n bits Reading n bits It is assumed that a user can never pass the same file as input and output.  
- <a href="class_bitstream_1_1_bit_stream.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aed13882a27fd986d566266b6a3807f73"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#aed13882a27fd986d566266b6a3807f73">__init__</a> (self, fin, fout)</td></tr>
-<tr class="separator:aed13882a27fd986d566266b6a3807f73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e777d97897b5e492fa6ef057b49b603"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a7e777d97897b5e492fa6ef057b49b603">__init__</a> (self, f, <a class="el" href="class_bitstream_1_1_bit_stream.html#aa63e150e14b778726928b3a01465ce27">mode</a>)</td></tr>
+<tr class="separator:a7e777d97897b5e492fa6ef057b49b603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61555888aa37bdc946c9e8d17a1457d9"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a61555888aa37bdc946c9e8d17a1457d9">__enter__</a> (self)</td></tr>
 <tr class="separator:a61555888aa37bdc946c9e8d17a1457d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dcbddeb6fd43c3cbf236e7242bdc4d9"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a0dcbddeb6fd43c3cbf236e7242bdc4d9">__exit__</a> (self, exc_type, exc_val, exc_tb)</td></tr>
@@ -88,26 +87,40 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad01fa7137f67252f316a84158735ae26"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#ad01fa7137f67252f316a84158735ae26">__del__</a> (self)</td></tr>
 <tr class="separator:ad01fa7137f67252f316a84158735ae26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9038554af6f7e28f3856c783a5bd363"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#ab9038554af6f7e28f3856c783a5bd363">writebits</a> (self, bits, n)</td></tr>
+<tr class="memdesc:ab9038554af6f7e28f3856c783a5bd363"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write N bits to file.  <a href="class_bitstream_1_1_bit_stream.html#ab9038554af6f7e28f3856c783a5bd363">More...</a><br /></td></tr>
 <tr class="separator:ab9038554af6f7e28f3856c783a5bd363"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0eaec85c48955deecf2a148a22bbda64"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a0eaec85c48955deecf2a148a22bbda64">readbits</a> (self, n)</td></tr>
+<tr class="memdesc:a0eaec85c48955deecf2a148a22bbda64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read N bits from a file.  <a href="class_bitstream_1_1_bit_stream.html#a0eaec85c48955deecf2a148a22bbda64">More...</a><br /></td></tr>
 <tr class="separator:a0eaec85c48955deecf2a148a22bbda64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e6ebc503e2d163a8aa4c0e0aff93526"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a6e6ebc503e2d163a8aa4c0e0aff93526">write_n_bits</a> (self, value, nbits)</td></tr>
+<tr class="memdesc:a6e6ebc503e2d163a8aa4c0e0aff93526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a given value using a certain number of bits to a file.  <a href="class_bitstream_1_1_bit_stream.html#a6e6ebc503e2d163a8aa4c0e0aff93526">More...</a><br /></td></tr>
+<tr class="separator:a6e6ebc503e2d163a8aa4c0e0aff93526"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4a1a3ba81ae9d92d5913c12bb8d249f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#af4a1a3ba81ae9d92d5913c12bb8d249f">read_n_bits</a> (self, nbits)</td></tr>
+<tr class="memdesc:af4a1a3ba81ae9d92d5913c12bb8d249f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the value corresponding to the next N bits of the file.  <a href="class_bitstream_1_1_bit_stream.html#af4a1a3ba81ae9d92d5913c12bb8d249f">More...</a><br /></td></tr>
+<tr class="separator:af4a1a3ba81ae9d92d5913c12bb8d249f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd56da8e1db075cfd149f9a8e9b1de8c"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#acd56da8e1db075cfd149f9a8e9b1de8c">flush</a> (self)</td></tr>
+<tr class="memdesc:acd56da8e1db075cfd149f9a8e9b1de8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auxiliary function to the write operations Writes the packaged bits to a file.  <a href="class_bitstream_1_1_bit_stream.html#acd56da8e1db075cfd149f9a8e9b1de8c">More...</a><br /></td></tr>
 <tr class="separator:acd56da8e1db075cfd149f9a8e9b1de8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a954b31fcd61f836dc15016be0534c33a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a954b31fcd61f836dc15016be0534c33a">set_infile</a> (self, fin)</td></tr>
-<tr class="separator:a954b31fcd61f836dc15016be0534c33a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f347315f2ad286c138e4a36cc83f167"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a1f347315f2ad286c138e4a36cc83f167">set_outfile</a> (self, fout)</td></tr>
-<tr class="separator:a1f347315f2ad286c138e4a36cc83f167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94e6c0470fe6562e3c4e2b5d9603dfab"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a94e6c0470fe6562e3c4e2b5d9603dfab">close</a> (self)</td></tr>
+<tr class="memdesc:a94e6c0470fe6562e3c4e2b5d9603dfab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close files Closes the file from where <a class="el" href="namespace_bitstream.html">Bitstream</a> is reading if the mode is READ Closes the file to where <a class="el" href="namespace_bitstream.html">Bitstream</a> is writing if the mode is WRITE Importantly, it deletes this object which, in turn, flushes any bits left in buffer.  <a href="class_bitstream_1_1_bit_stream.html#a94e6c0470fe6562e3c4e2b5d9603dfab">More...</a><br /></td></tr>
+<tr class="separator:a94e6c0470fe6562e3c4e2b5d9603dfab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a6341cefbe04d281270cec793d5c8c2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a9a6341cefbe04d281270cec793d5c8c2">writeTxt</a> (self, txt)</td></tr>
+<tr class="memdesc:a9a6341cefbe04d281270cec793d5c8c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writing text (strings) using the <a class="el" href="namespace_bitstream.html">Bitstream</a>.  <a href="class_bitstream_1_1_bit_stream.html#a9a6341cefbe04d281270cec793d5c8c2">More...</a><br /></td></tr>
+<tr class="separator:a9a6341cefbe04d281270cec793d5c8c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:aa63e150e14b778726928b3a01465ce27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#aa63e150e14b778726928b3a01465ce27">mode</a></td></tr>
+<tr class="memdesc:aa63e150e14b778726928b3a01465ce27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization function.  <a href="class_bitstream_1_1_bit_stream.html#aa63e150e14b778726928b3a01465ce27">More...</a><br /></td></tr>
+<tr class="separator:aa63e150e14b778726928b3a01465ce27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed464e34812ee5607a79e91408832c9c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#aed464e34812ee5607a79e91408832c9c">input</a></td></tr>
+<tr class="separator:aed464e34812ee5607a79e91408832c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f663a14241df21ae4e430b881b8a0fc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a3f663a14241df21ae4e430b881b8a0fc">out</a></td></tr>
+<tr class="separator:a3f663a14241df21ae4e430b881b8a0fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae05f5c98d5ecee86ac33c401b5cfdf6a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#ae05f5c98d5ecee86ac33c401b5cfdf6a">write_accumulator</a></td></tr>
 <tr class="separator:ae05f5c98d5ecee86ac33c401b5cfdf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac73f006d5e6bf65884e2c853fb7e1276"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#ac73f006d5e6bf65884e2c853fb7e1276">write_bcount</a></td></tr>
 <tr class="separator:ac73f006d5e6bf65884e2c853fb7e1276"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f663a14241df21ae4e430b881b8a0fc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a3f663a14241df21ae4e430b881b8a0fc">out</a></td></tr>
-<tr class="separator:a3f663a14241df21ae4e430b881b8a0fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed464e34812ee5607a79e91408832c9c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#aed464e34812ee5607a79e91408832c9c">input</a></td></tr>
-<tr class="separator:aed464e34812ee5607a79e91408832c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa36301d2bdcd18e049bacf0ab2a97dbf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#aa36301d2bdcd18e049bacf0ab2a97dbf">read_accumulator</a></td></tr>
 <tr class="separator:aa36301d2bdcd18e049bacf0ab2a97dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23ca51c799a12626d76a0633df66e9f1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitstream_1_1_bit_stream.html#a23ca51c799a12626d76a0633df66e9f1">read_bcount</a></td></tr>
@@ -116,10 +129,13 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a9dec74bc1afdd9cd80d3efb1075bcd94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="class_bitstream_1_1_bit_stream.html" title="BitStream class Supported methods: Writing one bit Reading one bit Writing n bits Reading n bits It i...">BitStream</a> class Supported methods: Writing one bit Reading one bit Writing n bits Reading n bits It is assumed that a user can never pass the same file as input and output. </p>
+<div class="textblock"><p>Adaptation of already existing code to: support a single mode of file manipulation at a time, write one bit to a file, read one bit from a file, write N bits to a file, read N bits from a file, write value M using N bits to a file, read N bits from a file and the value these correspond to.<br  />
+ Every function aborts the program if it requires a different mode. For instance, if the function _writebit() is called with <a class="el" href="namespace_bitstream.html">Bitstream</a> on READ mode. </p><dl class="section author"><dt>Author</dt><dd>Tiago Melo 89005 </dd>
+<dd>
+João Nogueira 89262 </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aed13882a27fd986d566266b6a3807f73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed13882a27fd986d566266b6a3807f73">&#9670;&nbsp;</a></span>__init__()</h2>
+<a id="a7e777d97897b5e492fa6ef057b49b603"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e777d97897b5e492fa6ef057b49b603">&#9670;&nbsp;</a></span>__init__()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -134,13 +150,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fin</em>, </td>
+          <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fout</em>&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -229,6 +245,26 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a94e6c0470fe6562e3c4e2b5d9603dfab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94e6c0470fe6562e3c4e2b5d9603dfab">&#9670;&nbsp;</a></span>close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def Bitstream.BitStream.close </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Close files Closes the file from where <a class="el" href="namespace_bitstream.html">Bitstream</a> is reading if the mode is READ Closes the file to where <a class="el" href="namespace_bitstream.html">Bitstream</a> is writing if the mode is WRITE Importantly, it deletes this object which, in turn, flushes any bits left in buffer. </p>
+
+</div>
+</div>
 <a id="acd56da8e1db075cfd149f9a8e9b1de8c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acd56da8e1db075cfd149f9a8e9b1de8c">&#9670;&nbsp;</a></span>flush()</h2>
 
@@ -244,6 +280,44 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Auxiliary function to the write operations Writes the packaged bits to a file. </p>
+
+</div>
+</div>
+<a id="af4a1a3ba81ae9d92d5913c12bb8d249f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4a1a3ba81ae9d92d5913c12bb8d249f">&#9670;&nbsp;</a></span>read_n_bits()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def Bitstream.BitStream.read_n_bits </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>nbits</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read the value corresponding to the next N bits of the file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>Number of bits that are going to be read from file </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -273,16 +347,25 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Read N bits from a file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">number</td><td>of bits to be read from a file </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>of bits read from file </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a954b31fcd61f836dc15016be0534c33a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a954b31fcd61f836dc15016be0534c33a">&#9670;&nbsp;</a></span>set_infile()</h2>
+<a id="a6e6ebc503e2d163a8aa4c0e0aff93526"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e6ebc503e2d163a8aa4c0e0aff93526">&#9670;&nbsp;</a></span>write_n_bits()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def Bitstream.BitStream.set_infile </td>
+          <td class="memname">def Bitstream.BitStream.write_n_bits </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -291,7 +374,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fin</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>nbits</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -301,33 +390,14 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a1f347315f2ad286c138e4a36cc83f167"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1f347315f2ad286c138e4a36cc83f167">&#9670;&nbsp;</a></span>set_outfile()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def Bitstream.BitStream.set_outfile </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>fout</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Write a given value using a certain number of bits to a file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>Value that is being written to a file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>Number of bits being used to write value Throws an error if value cannot be written using only nbits </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -363,6 +433,51 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Write N bits to file. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bits</td><td>to be written to a file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">number</td><td>of bits to be written </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9a6341cefbe04d281270cec793d5c8c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a6341cefbe04d281270cec793d5c8c2">&#9670;&nbsp;</a></span>writeTxt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def Bitstream.BitStream.writeTxt </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>txt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Writing text (strings) using the <a class="el" href="namespace_bitstream.html">Bitstream</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">txt</td><td>String to be written Additional method that was not planned but was proven useful </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -377,6 +492,29 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa63e150e14b778726928b3a01465ce27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa63e150e14b778726928b3a01465ce27">&#9670;&nbsp;</a></span>mode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Bitstream.BitStream.mode</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialization function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">file_name</td><td>Name of the file that is going to be manipulated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>Mode of manipulation (write/read) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

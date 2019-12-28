@@ -22,7 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Video Compressin&#39;
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
+   <div id="projectbrief">A Python-based video compressing and decompressing codec</div>
   </td>
  </tr>
  </tbody>
@@ -161,7 +163,7 @@ Public Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">number</td><td>The number to be encoded to Binary </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">sequence</td><td>The Binary code sequence If our factor=2^x then it's normal binary encoding Else it's truncated binary encoding (WIP) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sequence</td><td>The Binary code sequence If our factor=2^x then it's normal binary encoding, keeping in mind the number of bits should be equal to log(factor,2) If it isn't then truncated binary encoding is not implemented </td></tr>
   </table>
   </dd>
 </dl>

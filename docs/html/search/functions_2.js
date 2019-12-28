@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['decode_51',['decode',['../class_golomb_1_1_golomb.html#acb34a05fb31b5dfdc4d37c08d614346b',1,'Golomb::Golomb']]]
+  ['blockdif_161',['blockDif',['../class_hybrid_codec_1_1_hybrid_codec.html#a4f37fbf52d0aaf90164a80ca3b85d7ab',1,'HybridCodec::HybridCodec']]]
 ];

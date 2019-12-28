@@ -22,7 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Video Compressin&#39;
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
+   <div id="projectbrief">A Python-based video compressing and decompressing codec</div>
   </td>
  </tr>
  </tbody>
@@ -70,12 +72,18 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ac3d83a2728352690346a86b54a13543c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#ac3d83a2728352690346a86b54a13543c">bts</a> = <a class="el" href="class_bitstream_1_1_bit_stream.html">BitStream</a>(open(&quot;output_bits.dat&quot;, &quot;rb&quot;), open(&quot;input_bits.dat&quot;, &quot;wb&quot;))</td></tr>
-<tr class="separator:ac3d83a2728352690346a86b54a13543c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6aca8c6756ebd772455074511b8e47c6"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#a6aca8c6756ebd772455074511b8e47c6">chars</a> = '01000000'</td></tr>
+<tr class="memitem:a6aca8c6756ebd772455074511b8e47c6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#a6aca8c6756ebd772455074511b8e47c6">chars</a> = sys.argv[1]</td></tr>
 <tr class="separator:a6aca8c6756ebd772455074511b8e47c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23252b16a9af9f0b86c53dc09b5872d0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#a23252b16a9af9f0b86c53dc09b5872d0">x</a> = bts.readbits(8)</td></tr>
-<tr class="separator:a23252b16a9af9f0b86c53dc09b5872d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1aa71312a9701ffe70d713ff367e36d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#af1aa71312a9701ffe70d713ff367e36d">number</a> = int(sys.argv[2])</td></tr>
+<tr class="separator:af1aa71312a9701ffe70d713ff367e36d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7033aac5317c47dd8fdc6ec76e726a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#aa7033aac5317c47dd8fdc6ec76e726a7">nbits</a> = int(sys.argv[3])</td></tr>
+<tr class="separator:aa7033aac5317c47dd8fdc6ec76e726a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3d83a2728352690346a86b54a13543c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#ac3d83a2728352690346a86b54a13543c">bts</a> = <a class="el" href="class_bitstream_1_1_bit_stream.html">BitStream</a>(&quot;../res/output_bits.dat&quot;, &quot;WRITE&quot;)</td></tr>
+<tr class="separator:ac3d83a2728352690346a86b54a13543c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36af00143671b12773f4df71ad28a68a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#a36af00143671b12773f4df71ad28a68a">charlength</a> = len(<a class="el" href="namespacebitstream__test.html#a6aca8c6756ebd772455074511b8e47c6">chars</a>)</td></tr>
+<tr class="separator:a36af00143671b12773f4df71ad28a68a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97e55833da27dfdef4a66105d3a5c044"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacebitstream__test.html#a97e55833da27dfdef4a66105d3a5c044">f</a> = open(&quot;../res/output_bits.dat&quot;, &quot;rb&quot;)</td></tr>
+<tr class="separator:a97e55833da27dfdef4a66105d3a5c044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Variable Documentation</h2>
 <a id="ac3d83a2728352690346a86b54a13543c"></a>
@@ -85,7 +93,21 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bitstream_test.bts = <a class="el" href="class_bitstream_1_1_bit_stream.html">BitStream</a>(open(&quot;output_bits.dat&quot;, &quot;rb&quot;), open(&quot;input_bits.dat&quot;, &quot;wb&quot;))</td>
+          <td class="memname">bitstream_test.bts = <a class="el" href="class_bitstream_1_1_bit_stream.html">BitStream</a>(&quot;../res/output_bits.dat&quot;, &quot;WRITE&quot;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a36af00143671b12773f4df71ad28a68a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36af00143671b12773f4df71ad28a68a">&#9670;&nbsp;</a></span>charlength</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bitstream_test.charlength = len(<a class="el" href="namespacebitstream__test.html#a6aca8c6756ebd772455074511b8e47c6">chars</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -99,21 +121,49 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">list bitstream_test.chars = '01000000'</td>
+          <td class="memname">list bitstream_test.chars = sys.argv[1]</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a23252b16a9af9f0b86c53dc09b5872d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23252b16a9af9f0b86c53dc09b5872d0">&#9670;&nbsp;</a></span>x</h2>
+<a id="a97e55833da27dfdef4a66105d3a5c044"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97e55833da27dfdef4a66105d3a5c044">&#9670;&nbsp;</a></span>f</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bitstream_test.x = bts.readbits(8)</td>
+          <td class="memname">bitstream_test.f = open(&quot;../res/output_bits.dat&quot;, &quot;rb&quot;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa7033aac5317c47dd8fdc6ec76e726a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7033aac5317c47dd8fdc6ec76e726a7">&#9670;&nbsp;</a></span>nbits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int bitstream_test.nbits = int(sys.argv[3])</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1aa71312a9701ffe70d713ff367e36d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1aa71312a9701ffe70d713ff367e36d">&#9670;&nbsp;</a></span>number</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int bitstream_test.number = int(sys.argv[2])</td>
         </tr>
       </table>
 </div><div class="memdoc">

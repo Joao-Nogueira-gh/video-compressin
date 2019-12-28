@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['write_5faccumulator_31',['write_accumulator',['../class_bitstream_1_1_bit_stream.html#ae05f5c98d5ecee86ac33c401b5cfdf6a',1,'Bitstream::BitStream']]],
-  ['write_5fbcount_32',['write_bcount',['../class_bitstream_1_1_bit_stream.html#ac73f006d5e6bf65884e2c853fb7e1276',1,'Bitstream::BitStream']]],
-  ['writebits_33',['writebits',['../class_bitstream_1_1_bit_stream.html#ab9038554af6f7e28f3856c783a5bd363',1,'Bitstream::BitStream']]]
+  ['nbits_78',['nbits',['../namespacebitstream__test.html#aa7033aac5317c47dd8fdc6ec76e726a7',1,'bitstream_test']]],
+  ['number_79',['number',['../namespacebitstream__test.html#af1aa71312a9701ffe70d713ff367e36d',1,'bitstream_test']]]
 ];

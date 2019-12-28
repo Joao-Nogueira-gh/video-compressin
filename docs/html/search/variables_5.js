@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['read_64',['read',['../class_bitstream_1_1_bit_stream.html#a9dec74bc1afdd9cd80d3efb1075bcd94',1,'Bitstream::BitStream']]],
-  ['read_5faccumulator_65',['read_accumulator',['../class_bitstream_1_1_bit_stream.html#aa36301d2bdcd18e049bacf0ab2a97dbf',1,'Bitstream::BitStream']]],
-  ['read_5fbcount_66',['read_bcount',['../class_bitstream_1_1_bit_stream.html#a23ca51c799a12626d76a0633df66e9f1',1,'Bitstream::BitStream']]]
+  ['g_221',['g',['../namespacegolomb__test.html#a4f40896a5c2fabebe151827d3bac3347',1,'golomb_test']]],
+  ['gol_222',['gol',['../namespacehybrid__codec__test.html#a3e1aa92bf008d5818a4c94689078df29',1,'hybrid_codec_test.gol()'],['../namespaceintra__codec__test.html#a7b0fe606be4fb8072475ed07a467d361',1,'intra_codec_test.gol()'],['../namespacelossy__intra__coding__test.html#a45557f1585018d259ca3a0bbaa00d18e',1,'lossy_intra_coding_test.gol()']]],
+  ['golombparam_223',['golombParam',['../class_hybrid_codec_1_1_hybrid_codec.html#a25f5a7e87dc225c01d6df958b246d4ac',1,'HybridCodec.HybridCodec.golombParam()'],['../class_intra_codec_1_1_intra_codec.html#aaea52dd4eb55242343b6cd4532ca82b7',1,'IntraCodec.IntraCodec.golombParam()'],['../namespacehybrid__codec__test.html#a923389316616b5530ed381157c787936',1,'hybrid_codec_test.golombparam()'],['../namespaceintra__codec__test.html#a3c0b686ecd27324595b3f000e9e339fc',1,'intra_codec_test.golombparam()'],['../namespacelossy__intra__coding__test.html#a33faef1ec381e1f6e6ac6226e334ac4a',1,'lossy_intra_coding_test.golombparam()']]]
 ];
