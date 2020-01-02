@@ -418,12 +418,11 @@ class IntraCodec:
                 n=value[i]
             
             if self.quantizationStep!=None and self.quantizationStep[i]!=0:
-                newValue=pixel[i]+(n)
+                #newValue=pixel[i]+(n)
                 n=math.floor(n/self.quantizationStep[i])
                 
-                #TODO
-                if line!=0 and column!=0:
-                    self.updateYUVPixel(i,frame,line,column,newValue)
+                #if line!=0 and column!=0:
+                    #self.updateYUVPixel(i,frame,line,column,newValue)
             n=g.encode(n)
             bs.writebits(int(n,2),len(n))
 

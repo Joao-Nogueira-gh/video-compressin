@@ -1,3 +1,13 @@
+## @mainpage
+# @section Introduction
+# Documentation for all the classes and methods developed during the project.
+# @section Testing
+# Detailed instructions on how to run the test programs provided in the Report.pdf file.
+# @section Authors
+# - Tiago Melo 89005 <br>
+# - João Nogueira 89262
+
+
 ## @class BitStream
 # Adaptation of already existing code to: support a single mode of file manipulation at a time,
 # write one bit to a file, read one bit from a file, write N bits to a file, read N bits from a
